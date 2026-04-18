@@ -1,18 +1,11 @@
-'use client'
+import { LoginForm } from "@/components/auth/login-form";
 
-interface Props {
-	params: {
-		id: string;
-	};
-}
-
-export default function Page({ params }: Props) {
-	const { id } = params;
-
-	return (
-		<>
-			<h1>Page { id }</h1>
-			<p>Page content</p>
-		</>
-	);
+export default function LoginPage() {
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center bg-background dark:bg-background p-6 md:p-10">
+      <div className="w-full max-w-sm md:max-w-4xl">
+        <LoginForm />
+      </div>
+    </div>
+  );
 }
