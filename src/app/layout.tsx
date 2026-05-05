@@ -1,17 +1,18 @@
 import type { Viewport } from "next";
 import "./globals.css";
 
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import SessionProviderClient from "@/components/providers/SessionProviderClient";
+
 import ToastListener from "@/components/shared/ToastListener";
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 import { cn } from "@/lib/utils";
 import { metadata } from "@/lib/metadata";
 import { jsonLd } from "@/lib/seo";
 
 import { Geist, Geist_Mono, Inter, Roboto_Slab } from "next/font/google";
-import { SessionProvider } from "next-auth/react";
 
 // FONT SETUP
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -64,7 +65,7 @@ export default function RootLayout({
       </head>
 
       <body className="flex flex-col min-h-dvh">
-        <SessionProvider>
+        <SessionProviderClient>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -78,7 +79,7 @@ export default function RootLayout({
               <TooltipProvider>{children}</TooltipProvider>
             </main>
           </ThemeProvider>
-        </SessionProvider>
+        </SessionProviderClient>
       </body>
     </html>
   );
