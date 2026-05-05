@@ -11,6 +11,7 @@ import { metadata } from "@/lib/metadata";
 import { jsonLd } from "@/lib/seo";
 
 import { Geist, Geist_Mono, Inter, Roboto_Slab } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
 
 // FONT SETUP
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -63,19 +64,21 @@ export default function RootLayout({
       </head>
 
       <body className="flex flex-col min-h-dvh">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-center" />
-          <ToastListener />
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster position="top-center" />
+            <ToastListener />
 
-          <main>
-            <TooltipProvider>{children}</TooltipProvider>
-          </main>
-        </ThemeProvider>
+            <main>
+              <TooltipProvider>{children}</TooltipProvider>
+            </main>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );
