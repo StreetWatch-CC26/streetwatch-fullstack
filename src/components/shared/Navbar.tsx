@@ -18,7 +18,7 @@ import {
 const navItems = [
   { label: "Beranda", href: "/" },
   { label: "Tentang Kami", href: "/about" },
-  { label: "Partnership", href: "/partnership" },
+  { label: "Kemitraan", href: "/partnership" },
   { label: "Hubungi Kami", href: "/contact" },
 ];
 
@@ -174,35 +174,20 @@ export default function Navbar({ isLoggedIn }: NavbarProps) {
         {/* RIGHT */}
         <div className="flex items-center gap-3 md:me-10 lg:me-20">
           <ThemeToggle className="hidden md:flex" />
-
           {/* TOMBOL MASUK / DASHBOARD (DESKTOP) */}
-          {/* // Sementara aja ini woi */}
           {isLoggedIn ? (
-            <Link href="/login">
-              <Button size="sm" className="p-3 cursor-pointer">
-                Masuk
-              </Button>
-            </Link>
-          ) : (
             <Link href="/dashboard">
               <Button size="sm" className="p-3 cursor-pointer">
                 Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button size="sm" className="p-3 cursor-pointer">
+                Masuk
               </Button>
             </Link>
           )}
-          {/* {isLoggedIn ? (
-            <Link href="/dashboard">
-              <Button size="sm" className="p-3 cursor-pointer">
-                Dashboard
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/login">
-              <Button size="sm" className="p-3 cursor-pointer">
-                Masuk
-              </Button>
-            </Link>
-          )} */}
         </div>
       </div>
     </header>
