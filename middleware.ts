@@ -1,41 +1,54 @@
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth.config";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
-  //   const token = request.cookies.get("session-token")?.value;
-  //   const userRole = request.cookies.get("user-role")?.value;
-  //   const hasOnboarded = request.cookies.get("has-completed-onboarding")?.value;
+const { auth } = NextAuth(authConfig);
 
-  //   const { pathname } = request.nextUrl;
+const PROTECTED = [
+  "/dashboard/map",
+  "/dashboard/reports",
+  "/dashboard/reports/new",
+  "/dashboard/reports/:id",
+  "/dashboard/profile",
+  "/dashboard/playground",
+  "/dashboard/overview",
+];
 
-  //   // 1. Cek Onboarding (Jika belum onboarding dan bukan di halaman onboarding)
-  //   if (
-  //     !hasOnboarded &&
-  //     pathname !== "/welcome" &&
-  //     !pathname.startsWith("/_next")
-  //   ) {
-  //     return NextResponse.redirect(new URL("/welcome", request.url));
-  //   }
+const AUTH_ONLY = ["/login", "/register"];
 
-  //   // 2. Proteksi Admin (Contoh dengan Toast trigger)
-  //   if (pathname.startsWith("/dashboard")) {
-  //     if (!token || (userRole !== "admin" && userRole !== "super_admin")) {
-  //       const url = new URL("/login", request.url);
-  //       url.searchParams.set("error", "unauthorized"); // Sinyal untuk Toast
-  //       return NextResponse.redirect(url);
-  //     }
-  //   }
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+  const session = req.auth;
+  const completedOnboarding =
+    req.cookies.get("has-completed-onboarding")?.value === "true";
 
-  //   // 3. Jika sudah login tapi coba akses login page lagi
-  //   if (token && pathname === "/login") {
-  //     const url = new URL("/home", request.url);
-  //     url.searchParams.set("success", "welcome"); // Sinyal untuk Toast
-  //     return NextResponse.redirect(url);
-  //   }
+  const isProtected = PROTECTED.some((p) => pathname.startsWith(p));
+  const isAuthPage = AUTH_ONLY.some((p) => pathname.startsWith(p));
+
+  // Belum login → redirect ke /login
+  if (isProtected && !session) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // Sudah login → tidak perlu ke halaman auth
+  if (isAuthPage && session) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard/map";
+    return NextResponse.redirect(url);
+  }
+
+  if (!completedOnboarding && !pathname.startsWith("/welcome")) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/welcome";
+    return NextResponse.redirect(url);
+  }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth).*)"],
 };
