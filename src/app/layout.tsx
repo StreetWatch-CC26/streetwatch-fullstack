@@ -13,6 +13,7 @@ import { metadata } from "@/lib/metadata";
 import { jsonLd } from "@/lib/seo";
 
 import { Geist, Geist_Mono, Inter, Roboto_Slab } from "next/font/google";
+import Script from "next/script";
 
 // FONT SETUP
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -56,7 +57,8 @@ export default function RootLayout({
       )}
     >
       <head>
-        <script
+        <Script
+          id="json-ld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
@@ -64,22 +66,22 @@ export default function RootLayout({
         />
       </head>
 
-      <body className="flex flex-col min-h-dvh">
-        <SessionProviderClient>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+      <body className="flex flex-col min-h-dvh" suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProviderClient>
             <Toaster position="top-center" />
             <ToastListener />
 
             <main>
               <TooltipProvider>{children}</TooltipProvider>
             </main>
-          </ThemeProvider>
-        </SessionProviderClient>
+          </SessionProviderClient>
+        </ThemeProvider>
       </body>
     </html>
   );
