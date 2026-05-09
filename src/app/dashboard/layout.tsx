@@ -1,15 +1,11 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/AppSidebar";
+import {
+  LeftDashboardHeader,
+  RightDashboardHeader,
+} from "@/components/shared/DashboardHeader";
 import { MobileBottomNav } from "@/components/shared/MobileBottomNav";
 import { MobileHeader } from "@/components/shared/MobileHeader";
-import ThemeToggle from "@/components/shared/ThemeToggle";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -28,27 +24,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <SidebarInset>
         {/* ── Desktop header — hidden on mobile ── */}
         <header className="hidden sm:flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex justify-center items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator
               orientation="vertical"
               className="mr-2 data-vertical:h-4 data-vertical:self-auto"
             />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="#">Street Watch</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <LeftDashboardHeader />
           </div>
-          <div className="flex items-center px-4">
-            <ThemeToggle />
-          </div>
+          <RightDashboardHeader />
         </header>
 
         {/* ── Mobile header — hidden on desktop ── */}
