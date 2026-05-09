@@ -11,6 +11,7 @@ import {
   RiAddCircleFill,
   RiFlaskFill,
   RiMenuFill,
+  RiGlobalFill,
 } from "@remixicon/react";
 
 import {
@@ -38,7 +39,7 @@ const mainNavItems = [
   { title: "Peta", url: "/dashboard/map", icon: RiCompassDiscoverFill },
   {
     title: "Lapor",
-    url: "/dashboard/report/new",
+    url: "/dashboard/reports/new",
     icon: RiAddCircleFill,
     cta: true,
   },
@@ -51,23 +52,23 @@ const menuGroups = [
     title: "Akun Saya",
     items: [
       { label: "Profil Pengguna", icon: User, url: "/dashboard/profile" },
-      { label: "Pengaturan", icon: Settings, url: "/dashboard/settings" },
+      // { label: "Pengaturan", icon: Settings, url: "/dashboard/settings" },
     ],
   },
   {
     title: "Aktivitas",
     items: [
-      { label: "Laporan Saya", icon: FileText, url: "/dashboard/my-reports" },
-      { label: "Tersimpan", icon: Bookmark, url: "/dashboard/saved" },
+      { label: "Laporan Saya", icon: FileText, url: "/dashboard/reports" },
+      // { label: "Tersimpan", icon: Bookmark, url: "/dashboard/saved" },
     ],
   },
-  {
-    title: "Lainnya",
-    items: [
-      { label: "Bantuan & Dukungan", icon: HelpCircle, url: "/support" },
-      { label: "Tema Gelap", icon: Moon, action: "toggle-theme" }, // Contoh aksi non-URL
-    ],
-  },
+  // {
+  //   title: "Lainnya",
+  //   items: [
+  //     // { label: "Bantuan & Dukungan", icon: HelpCircle, url: "/support" },
+  //     { label: "Tema Gelap", icon: Moon, action: "toggle-theme" },
+  //   ],
+  // },
 ];
 
 export function MobileBottomNav() {
@@ -128,7 +129,7 @@ export function MobileBottomNav() {
                     <item.icon
                       className={cn(
                         "transition-all duration-200",
-                        isActive ? "h-[22px] w-[22px]" : "h-5 w-5",
+                        isActive ? "h-5.5 w-5.5" : "h-5 w-5",
                       )}
                     />
                   </div>
@@ -178,7 +179,7 @@ export function MobileBottomNav() {
                 <RiMenuFill
                   className={cn(
                     "transition-all duration-200",
-                    isDrawerOpen ? "h-[22px] w-[22px]" : "h-5 w-5",
+                    isDrawerOpen ? "h-5.5 w-5.5" : "h-5 w-5",
                   )}
                 />
               </div>
@@ -193,7 +194,10 @@ export function MobileBottomNav() {
             </button>
           </DrawerTrigger>
 
-          <DrawerContent className="z-50 bg-background/95 backdrop-blur-xl border-t border-border">
+          <DrawerContent
+            aria-describedby="Menu lainnya"
+            className="z-50 bg-background/95 backdrop-blur-xl border-t border-border"
+          >
             <div className="mx-auto w-full max-w-sm px-4 pb-8 pt-4">
               <DrawerHeader className="text-left px-0 pb-4">
                 <DrawerTitle className="text-lg font-bold">
@@ -246,6 +250,14 @@ export function MobileBottomNav() {
                   <LogOut className="w-5 h-5" />
                   <span className="text-sm font-semibold">Keluar Akun</span>
                 </button>
+
+                <Link
+                  href="/"
+                  className="flex items-center gap-3 p-3 w-full rounded-lg text-primary hover:bg-primary/10 transition-colors active:scale-[0.98]"
+                >
+                  <RiGlobalFill className="w-5 h-5" />
+                  <span className="text-sm font-semibold">Public Site</span>
+                </Link>
               </div>
             </div>
           </DrawerContent>
