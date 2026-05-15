@@ -2,7 +2,7 @@
  * components/dashboard/MapLegend.tsx
  */
 
-import type { Urgency } from "@/data/mock-reports";
+import { Urgency } from "@/generated/prisma/enums";
 
 const URGENCY_ITEMS: { urgency: Urgency; label: string; hex: string }[] = [
   { urgency: "high", label: "Tinggi", hex: "#ef4444" },
