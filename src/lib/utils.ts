@@ -211,3 +211,73 @@ function toRad(degrees: number): number {
 export function isValidCoordinates(lat: number, lng: number): boolean {
   return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
 }
+
+// Page title mapping berdasarkan route
+export const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> =
+  {
+    "/dashboard/overview": {
+      title: "Statistik",
+      subtitle: "Ringkasan statistik kerusakan jalan",
+    },
+    "/dashboard/overview/activity": {
+      title: "Aktifitas Terbaru",
+      subtitle: "Ringkasan aktifitas terbaru",
+    },
+
+    "/dashboard/map": {
+      title: "Peta Sebaran",
+      subtitle: "Sebaran kerusakan jalan di peta",
+    },
+
+    "/dashboard/reports": {
+      title: "Daftar Laporan",
+      subtitle: "Semua daftar laporan kerusakan jalan",
+    },
+    "/dashboard/reports/new": {
+      title: "Buat Laporan",
+      subtitle: "Laporkan kerusakan jalan yang kamu temui",
+    },
+    "/dashboard/reports/:id": {
+      title: "Detail Laporan",
+      subtitle: "Detail informasi kerusakan jalan ",
+    },
+
+    "/dashboard/profile": { title: "Profil", subtitle: "Akun & pencapaian" },
+
+    "/dashboard/playground": {
+      title: "StreetWatch AI",
+      subtitle: "Analisis gambar kerusakan jalan dengan AI",
+    },
+  };
+
+// Fungsi untuk mendapatkan title dan subtitle berdasarkan pathname
+export function getPageMeta(pathname: string) {
+  // 1. Cek pencocokan persis (Exact match)
+  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
+
+  // 2. Cek pencocokan dinamis (:id)
+  for (const route in PAGE_TITLES) {
+    if (route.includes(":id")) {
+      // Buat regex dan tangkap isinya dengan tanda kurung ([^/]+)
+      const regexPattern = new RegExp(
+        "^" + route.replace(":id", "([^/]+)") + "$",
+      );
+      const match = pathname.match(regexPattern);
+
+      if (match) {
+        const id = match[1]; // match[1] berisi ID yang diambil dari URL
+        const meta = PAGE_TITLES[route];
+
+        return {
+          ...meta,
+          // Gabungkan teks statis dengan ID yang didapat
+          // title: `Detail Laporan ${id.substring(0, 6)}`, // Dipotong agar tidak terlalu panjang di mobile
+          title: `Detail Laporan ${id}`,
+        };
+      }
+    }
+  }
+
+  // 3. Fallback jika tidak ditemukan
+  return { title: "Street Watch", subtitle: undefined };
+}
