@@ -17,7 +17,7 @@ import {
 import {
   RiPieChartLine,
   RiCompassDiscoverLine,
-  RiFlaskLine,
+  // RiFlaskLine,
   RiFileChartLine,
   RiAccountCircle2Line,
   RiGlobalLine,
@@ -37,10 +37,10 @@ const data = {
           title: "Statistik",
           url: "/dashboard/overview",
         },
-        {
-          title: "Aktivitas Terbaru",
-          url: "/dashboard/overview/activity",
-        },
+        // {
+        //   title: "Aktivitas Terbaru",
+        //   url: "/dashboard/overview/activity",
+        // },
       ],
     },
     {
@@ -102,25 +102,25 @@ const data = {
       ],
     },
 
-    {
-      title: "StreetWatch AI",
-      url: "/dashboard/playground",
-      icon: RiFlaskLine,
-      items: [
-        {
-          title: "Analisis Gambar",
-          url: "/dashboard/playground",
-        },
-        // {
-        //   title: "Analisis AI",
-        //   url: "/dashboard/playground/analyze",
-        // },
-        // {
-        //   title: "Riwayat AI",
-        //   url: "/dashboard/playground/history",
-        // },
-      ],
-    },
+    // {
+    //   title: "StreetWatch AI",
+    //   url: "/dashboard/playground",
+    //   icon: RiFlaskLine,
+    //   items: [
+    //     {
+    //       title: "Analisis Gambar",
+    //       url: "/dashboard/playground",
+    //     },
+    //     // {
+    //     //   title: "Analisis AI",
+    //     //   url: "/dashboard/playground/analyze",
+    //     // },
+    //     // {
+    //     //   title: "Riwayat AI",
+    //     //   url: "/dashboard/playground/history",
+    //     // },
+    //   ],
+    // },
   ],
 
   navSecondary: [
