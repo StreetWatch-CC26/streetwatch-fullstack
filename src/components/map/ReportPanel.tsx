@@ -12,7 +12,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import type { Report } from "@/data/mock-reports";
+
 import {
   X,
   MapPin,
@@ -27,6 +27,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Report } from "@/generated/prisma/browser";
 
 // ─── Label / colour maps ──────────────────────────────────────────────────────
 
@@ -36,16 +37,15 @@ const URGENCY_LABEL = {
   low: "Rendah",
 } as const;
 const STATUS_LABEL = {
-  pending: "Menunggu",
+  fail: "Analisis Gagal",
   verified: "Terverifikasi",
-  in_progress: "Dalam Perbaikan",
-  resolved: "Selesai",
 } as const;
 const CATEGORY_LABEL = {
   lubang: "Lubang",
   retak: "Retak",
   amblas: "Amblas",
   longsor: "Longsor",
+  bergelombang: "Bergelombang",
   lainnya: "Lainnya",
 } as const;
 
@@ -56,11 +56,8 @@ const URGENCY_COLOR: Record<string, string> = {
   low: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
 };
 const STATUS_COLOR: Record<string, string> = {
-  pending: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
+  fail: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
   verified: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  in_progress: "bg-primary/10 text-primary",
-  resolved:
-    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -156,7 +153,7 @@ export function ReportPanel({
 
         {/* Body (Scrollable) */}
         <div className="px-4 py-3 space-y-3 overflow-y-auto overscroll-contain">
-          {/* ─── Image Section (New) ─── */}
+          {/* ─── Image Section ─── */}
           {report.imageUrl ? (
             <div className="relative w-full h-36 md:h-40 rounded-lg overflow-hidden border border-border shrink-0 bg-muted">
               <Image
@@ -267,7 +264,7 @@ export function ReportPanel({
             className="h-9 w-9 p-0 shrink-0"
             title="Lihat detail"
             onClick={() =>
-              window.open(`/dashboard/report/${report.id}`, "_blank")
+              window.open(`/dashboard/reports/${report.id}`, "_blank")
             }
           >
             <ExternalLink className="w-3.5 h-3.5" />
