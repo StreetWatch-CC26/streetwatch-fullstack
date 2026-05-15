@@ -9,7 +9,7 @@
 
 import { useState, useCallback } from "react";
 import useSWR from "swr";
-import { findProvinsi, findKabupaten } from "@/data/wilayah-coords";
+import { findProvinsi, findKabupaten } from "@/data/wilayahCoord";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,7 +44,7 @@ export interface WilayahFilterState {
 const fetcher = async (path: string): Promise<WilayahItem[]> => {
   const res = await fetch(`/api/wilayah/${path}`);
   if (!res.ok) throw new Error(`Gagal memuat data (${res.status})`);
-  const raw: any[] = await res.json();
+  const raw: { id: number | string; nama?: string; name?: string }[] = await res.json();
   return raw.map((r) => ({
     id: String(r.id),
     nama: r.nama ?? r.name ?? "",
