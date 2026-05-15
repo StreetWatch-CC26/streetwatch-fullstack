@@ -19,13 +19,16 @@ export function Footer() {
           <h4 className="text-sm font-medium mb-3">Navigation</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link href="/">Home</Link>
+              <Link href="/">Beranda</Link>
             </li>
             <li>
-              <Link href="/report">Report</Link>
+              <Link href="/about">Tentang Kami</Link>
             </li>
             <li>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/partnership">Kemitraan</Link>
+            </li>
+            <li>
+              <Link href="/contact">Hubungi Kami</Link>
             </li>
           </ul>
         </div>
@@ -34,7 +37,14 @@ export function Footer() {
         <div>
           <h4 className="text-sm font-medium mb-3">Contact</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>Email: streetwatch@mail.com</li>
+            <li>
+              <a
+                href="mailto:streetwatch.ai@gmail.com"
+                className="hover:underline"
+              >
+                Email: streetwatch.ai@mail.com
+              </a>
+            </li>
             <li>Indonesia</li>
           </ul>
         </div>
@@ -47,21 +57,21 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center w-full">
         <Image
           src="/logo-light.png"
           alt="Logo"
-          width={1200}
-          height={400}
-          className="block dark:hidden"
+          width={1000}
+          height={1000}
+          className="block dark:hidden w-full h-auto max-w-6xl"
         />
         {/* Dark mode */}
         <Image
           src="/logo-dark.png"
           alt="Logo"
-          width={1200}
-          height={400}
-          className="hidden dark:block"
+          width={1000}
+          height={1000}
+          className="hidden dark:block w-full h-auto max-w-6xl"
         />
       </div>
     </footer>
