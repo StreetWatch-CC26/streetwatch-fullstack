@@ -29,7 +29,7 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-1">Lokasi Kami</h3>
                 <p className="text-muted-foreground text-sm md:text-base">
-                  Negara kesatuan Republik Indonesia
+                  Indonesia
                 </p>
               </div>
             </div>
@@ -41,7 +41,7 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-1">Email</h3>
                 <p className="text-muted-foreground text-sm md:text-base">
-                  streetwatch@gmail.com
+                  streetwatch.ai@gmail.com
                 </p>
               </div>
             </div>
@@ -53,7 +53,7 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-1">Instagram</h3>
                 <p className="text-muted-foreground text-sm md:text-base">
-                  Streetwatch.id
+                  streetwatch.ai
                 </p>
               </div>
             </div>
