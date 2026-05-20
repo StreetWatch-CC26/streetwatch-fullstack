@@ -35,7 +35,7 @@ export function CTASection() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                className="gap-2 bg-white text-primary hover:bg-white/90 text-base px-8"
+                className="gap-2 bg-background text-primary hover:bg-background/90 text-base px-8"
                 asChild
               >
                 <Link href="/register">
@@ -45,8 +45,7 @@ export function CTASection() {
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="gap-2 border-white/40 text-primary-foreground hover:bg-white/10 text-base px-8"
+                className="gap-2 bg-background text-primary hover:bg-background/90 text-base px-8"
                 asChild
               >
                 <Link href="/partnership">
