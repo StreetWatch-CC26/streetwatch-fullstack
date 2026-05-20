@@ -9,25 +9,17 @@ import {
   RiPieChart2Fill,
   RiCompassDiscoverFill,
   RiAddCircleFill,
-  RiFlaskFill,
+  // RiFlaskFill,
   RiMenuFill,
   RiGlobalFill,
 } from "@remixicon/react";
 
-import {
-  User,
-  Settings,
-  FileText,
-  Bookmark,
-  HelpCircle,
-  LogOut,
-  Moon,
-  ChevronRight,
-} from "lucide-react";
+import { User, FileText, LogOut, ChevronRight } from "lucide-react";
 
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -43,32 +35,24 @@ const mainNavItems = [
     icon: RiAddCircleFill,
     cta: true,
   },
-  { title: "AI", url: "/dashboard/playground", icon: RiFlaskFill },
+  { title: "Profil", url: "/dashboard/profile", icon: User },
+  // { title: "AI", url: "/dashboard/playground", icon: RiFlaskFill },
 ];
 
 // Menu Dalam (Drawer)
 const menuGroups = [
-  {
-    title: "Akun Saya",
-    items: [
-      { label: "Profil Pengguna", icon: User, url: "/dashboard/profile" },
-      // { label: "Pengaturan", icon: Settings, url: "/dashboard/settings" },
-    ],
-  },
+  // {
+  //   title: "Akun Saya",
+  //   items: [
+  //     { label: "Profil Pengguna", icon: User, url: "/dashboard/profile" },
+  //   ],
+  // },
   {
     title: "Aktivitas",
     items: [
       { label: "Laporan Saya", icon: FileText, url: "/dashboard/reports" },
-      // { label: "Tersimpan", icon: Bookmark, url: "/dashboard/saved" },
     ],
   },
-  // {
-  //   title: "Lainnya",
-  //   items: [
-  //     // { label: "Bantuan & Dukungan", icon: HelpCircle, url: "/support" },
-  //     { label: "Tema Gelap", icon: Moon, action: "toggle-theme" },
-  //   ],
-  // },
 ];
 
 export function MobileBottomNav() {
@@ -80,7 +64,8 @@ export function MobileBottomNav() {
       <nav
         className={cn(
           "sm:hidden",
-          "fixed bottom-4 left-4 right-4 z-40",
+          "fixed bottom-4 left-4 right-4",
+          "z-1000",
           "h-16 flex items-center justify-around",
           "rounded-2xl border border-border/60",
           "bg-background/85 backdrop-blur-xl",
@@ -97,7 +82,7 @@ export function MobileBottomNav() {
             <Link
               key={item.url}
               href={item.url}
-              onClick={() => setIsDrawerOpen(false)} // Tutup drawer jika pindah halaman
+              onClick={() => setIsDrawerOpen(false)}
               className={cn(
                 "relative flex flex-col items-center justify-center gap-0.5",
                 "flex-1 h-full rounded-xl transition-all duration-200",
@@ -167,7 +152,7 @@ export function MobileBottomNav() {
                 "relative flex flex-col items-center justify-center gap-0.5",
                 "flex-1 h-full rounded-xl transition-all duration-200",
                 "select-none tap-highlight-transparent text-muted-foreground hover:text-foreground",
-                isDrawerOpen && "text-primary", // Highlight ikon menu saat drawer terbuka
+                isDrawerOpen && "text-primary",
               )}
             >
               <div
@@ -196,13 +181,17 @@ export function MobileBottomNav() {
 
           <DrawerContent
             aria-describedby="Menu lainnya"
-            className="z-50 bg-background/95 backdrop-blur-xl border-t border-border"
+            className="z-1100 bg-background/95 backdrop-blur-xl border-t border-border"
           >
             <div className="mx-auto w-full max-w-sm px-4 pb-8 pt-4">
               <DrawerHeader className="text-left px-0 pb-4">
                 <DrawerTitle className="text-lg font-bold">
                   Menu Street Watch
                 </DrawerTitle>
+                <DrawerDescription className="sr-only">
+                  Akses fitur lainnya seperti laporan saya, pengaturan akun, dan
+                  lainnya.
+                </DrawerDescription>
               </DrawerHeader>
 
               <div className="space-y-6">
@@ -229,9 +218,7 @@ export function MobileBottomNav() {
                         ) : (
                           <button
                             key={itemIdx}
-                            onClick={() => {
-                              /* Tambahkan logika toggle tema di sini */
-                            }}
+                            onClick={() => {}}
                             className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-colors active:scale-[0.98]"
                           >
                             <div className="flex items-center gap-3 text-sm font-medium">
@@ -245,7 +232,6 @@ export function MobileBottomNav() {
                   </div>
                 ))}
 
-                {/* Tombol Logout Merah */}
                 <button className="flex items-center gap-3 p-3 w-full rounded-lg text-destructive hover:bg-destructive/10 transition-colors active:scale-[0.98]">
                   <LogOut className="w-5 h-5" />
                   <span className="text-sm font-semibold">Keluar Akun</span>
