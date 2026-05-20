@@ -39,11 +39,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <MobileHeader />
 
         {/*
-          ── Page content container ──
-          Mobile  : 100dvh - mobile header (56px) - bottom nav (80px) - gap (12px) ≈ 156px total
-          Desktop : 100dvh - desktop header (65px)
+          MOBILE  : padding-bottom mencegah konten tertutup bottom nav.
+                    Bottom nav tingginya 64px (h-16) + bottom offset 16px (bottom-4) = 80px.
+                    Kita beri pb-[88px] agar ada sedikit breathing room.
+          DESKTOP : tidak perlu padding bawah karena bottom nav hidden di sm:+
         */}
-        <div className="overflow-hidden">{children}</div>
+        <div className="overflow-hidden pb-22 sm:pb-0">{children}</div>
       </SidebarInset>
 
       {/* ── Mobile bottom nav — hidden on desktop ── */}
