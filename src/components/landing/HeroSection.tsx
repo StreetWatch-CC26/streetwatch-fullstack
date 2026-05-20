@@ -9,7 +9,7 @@ const stats = [
   { value: "94%", label: "Akurasi Deteksi AI" },
 ];
 
-export function HeroSection() {
+export function HeroSection(isLoggedIn: boolean) {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16 pb-6 ">
       {/* Background grid texture */}
@@ -59,10 +59,17 @@ export function HeroSection() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Button size="lg" className="gap-2 text-base px-8" asChild>
-            <Link href="/register">
-              Laporkan Sekarang
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard">
+                Laporkan Sekarang
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <Link href="/register">
+                Laporkan Sekarang
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </Button>
           <Button
             size="lg"
