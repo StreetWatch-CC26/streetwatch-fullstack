@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Camera, Upload, X, Image as ImageIcon, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { RiLightbulbFill } from "@remixicon/react";
 
 interface ImageUploadProps {
   imagePreview: string;
@@ -76,7 +77,7 @@ export function ImageUpload({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-foreground">
+      <label className="block text-base font-medium text-foreground">
         Foto Kerusakan <span className="text-destructive">*</span>
       </label>
 
@@ -119,12 +120,6 @@ export function ImageUpload({
               <X className="w-3.5 h-3.5" /> Hapus
             </button>
           </div>
-          {/* Filename chip */}
-          {/* {fileName && (
-                 <div className="absolute bottom-2 left-2 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm text-[10px] text-muted-foreground font-mono border border-border/60">
-                   {fileName}
-                 </div>
-               )} */}
         </div>
       ) : (
         // Upload Area
@@ -133,7 +128,7 @@ export function ImageUpload({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={cn(
-            "relative aspect-video w-full min-h-55 border-2 border-dashed rounded-lg transition-all cursor-pointer",
+            "relative aspect-video w-full min-h-65 border-2 border-dashed rounded-lg transition-all cursor-pointer",
             isDragging
               ? "border-primary bg-primary/5 scale-[1.02]"
               : "border-border hover:border-primary/50 hover:bg-accent/50",
@@ -142,15 +137,15 @@ export function ImageUpload({
           onClick={openFileDialog}
         >
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-            <div className="p-4 rounded-full bg-primary/10 mb-4">
-              <ImageIcon className="w-8 h-8 text-primary" />
+            <div className="p-4 rounded-full bg-primary/10 mb-1 sm:mb-4">
+              <ImageIcon className="w-6 sm:w-8 h-6 sm:h-8 text-primary" />
             </div>
 
-            <h3 className="text-lg font-semibold text-foreground mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
               Unggah Foto Kerusakan
             </h3>
 
-            <p className="text-sm text-muted-foreground mb-4 max-w-sm">
+            <p className="text-xs text-muted-foreground mb-4 max-w-sm">
               Drag & drop foto di sini, atau klik untuk memilih file
             </p>
 
@@ -183,7 +178,7 @@ export function ImageUpload({
 
               <button
                 type="button"
-                className="md:hidden inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium hover:bg-secondary/90 transition-colors"
+                className="md:hidden inline-flex items-center gap-2 px-4 py-2 bg-primary text-secondary rounded-lg font-medium hover:bg-primary/90 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   // Create a new input without capture attribute for gallery
@@ -213,9 +208,9 @@ export function ImageUpload({
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <p className="text-xs text-muted-foreground">
-        💡 Foto akan dikompres otomatis tanpa mengurangi kualitas untuk analisis
-        ML
+      <p className="text-xs text-muted-foreground align-middle mb-3">
+        <RiLightbulbFill className="inline w-4 h-4 text-yellow-500 mr-1 items-center" />
+        Foto akan dikompres otomatis
       </p>
     </div>
   );

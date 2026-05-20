@@ -180,7 +180,7 @@ export function LocationPicker({
         {/* Map Container */}
         <div
           ref={containerRef}
-          className="w-full h-[350px] md:h-[400px] rounded-lg border border-border z-0"
+          className="w-full h-87.5 md:h-100 rounded-lg border border-border z-0"
         />
 
         {/* Loading Overlay */}
@@ -194,7 +194,7 @@ export function LocationPicker({
         )}
 
         {/* Custom Controls (Berada di atas peta) */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 z-[400]">
+        <div className="absolute top-3 right-3 flex flex-col gap-2 z-400">
           <Button
             type="button"
             size="icon"
@@ -219,29 +219,23 @@ export function LocationPicker({
         </div>
 
         {/* Coordinates Display */}
-        <div className="absolute bottom-3 left-3 bg-background/95 backdrop-blur-sm px-3 py-1.5 rounded-md shadow border border-border z-[400] pointer-events-none">
+        <div className="absolute bottom-3 left-3 bg-background/95 backdrop-blur-sm px-3 py-1.5 rounded-md shadow border border-border z-400 pointer-events-none">
           <p className="text-[11px] font-mono font-medium text-foreground">
             {lat.toFixed(6)}, {lng.toFixed(6)}
           </p>
         </div>
       </div>
 
-      <div className="flex items-start gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
-        <MapPin className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+      <div className="flex items-start gap-2 p-3 bg-foreground/10 rounded-lg border border-primary/10">
+        <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
         <div className="text-sm">
           <p className="font-semibold text-foreground mb-1 text-xs">
             Instruksi Peta:
           </p>
-          <ul className="text-muted-foreground space-y-0.5 text-xs">
-            <li>
-              • <strong>Sentuh peta</strong> untuk memindahkan pin lokasi
-            </li>
-            <li>
-              • <strong>Seret (Drag) pin</strong> untuk penyesuaian akurat
-            </li>
-            <li>
-              • Data wilayah (Kecamatan/Kelurahan) akan otomatis diperbarui
-            </li>
+          <ul className="text-foreground space-y-0.5 text-xs font-bold list-disc">
+            <li>Sentuh peta untuk memindahkan pin lokasi</li>
+            <li>Seret (Drag) pin untuk penyesuaian akurat</li>
+            <li>Data wilayah (Kecamatan/Kelurahan) akan otomatis diperbarui</li>
           </ul>
         </div>
       </div>

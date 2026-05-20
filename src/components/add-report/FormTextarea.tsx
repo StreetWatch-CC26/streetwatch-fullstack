@@ -26,7 +26,7 @@ export function FormTextarea({
 }: FormTextareaProps) {
   return (
     <div className={cn("space-y-2", className)}>
-      <label className="block text-sm font-medium text-foreground">
+      <label className="block text-base font-medium text-foreground">
         {label} {required && <span className="text-destructive">*</span>}
       </label>
       <Textarea
