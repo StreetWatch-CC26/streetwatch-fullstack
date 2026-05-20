@@ -130,7 +130,7 @@ export function UrgencyFilterBar({
 
   return (
     <div
-      className={cn("flex items-center gap-1.5 flex-wrap", className)}
+      className={cn("flex items-center gap-1.5 flex-wrap w-full", className)}
       role="group"
       aria-label="Filter tingkat kerusakan"
     >
@@ -139,7 +139,7 @@ export function UrgencyFilterBar({
         onClick={handleAllClick}
         aria-pressed={allActive}
         className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold",
+          "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-semibold",
           "border transition-all duration-150 select-none",
           "ring-1 ring-transparent",
           allActive
