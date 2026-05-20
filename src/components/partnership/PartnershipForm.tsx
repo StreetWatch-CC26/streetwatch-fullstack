@@ -51,19 +51,19 @@ export function PartnershipForm() {
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed mb-8">
               Tim kemitraan kami akan merespons dalam 2×24 jam. Tidak ada
-              komitmen di tahap awal — mari diskusi dulu.
+              komitmen di tahap awal, mari diskusi dulu.
             </p>
 
             {/* Contact details */}
             <div className="space-y-4">
               <a
-                href="mailto:partnership@streetwatch.id"
+                href="mailto:streetwatch.ai@gmail.com"
                 className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group"
               >
                 <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                   <Mail className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
-                partnership@streetwatch.id
+                streetwatch.ai@gmail.com
               </a>
               <a
                 href="tel:+628001234567"
@@ -72,7 +72,7 @@ export function PartnershipForm() {
                 <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                   <Phone className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
-                0800-1234-567 (Gratis)
+                0851-6178-9060 (Gratis)
               </a>
             </div>
 
@@ -82,16 +82,21 @@ export function PartnershipForm() {
                 Mitra Aktif
               </p>
               <div className="flex flex-wrap gap-2">
-                {["Pekanbaru", "Batam", "Medan", "Surabaya", "Makassar", "Banjarmasin"].map(
-                  (city) => (
-                    <span
-                      key={city}
-                      className="text-xs px-3 py-1.5 rounded-full border border-border bg-muted/50 text-muted-foreground"
-                    >
-                      Kota {city}
-                    </span>
-                  )
-                )}
+                {[
+                  "Pekanbaru",
+                  "Batam",
+                  "Medan",
+                  "Surabaya",
+                  "Makassar",
+                  "Banjarmasin",
+                ].map((city) => (
+                  <span
+                    key={city}
+                    className="text-xs px-3 py-1.5 rounded-full border border-border bg-muted/50 text-muted-foreground"
+                  >
+                    Kota {city}
+                  </span>
+                ))}
                 <span className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary">
                   +12 lainnya
                 </span>
@@ -227,7 +232,10 @@ export function PartnershipForm() {
 
                 <p className="text-xs text-muted-foreground text-center">
                   Dengan mengirim formulir ini, kamu menyetujui{" "}
-                  <a href="/privacy" className="underline underline-offset-4 hover:text-foreground">
+                  <a
+                    href="/privacy"
+                    className="underline underline-offset-4 hover:text-foreground"
+                  >
                     Kebijakan Privasi
                   </a>{" "}
                   StreetWatch.
