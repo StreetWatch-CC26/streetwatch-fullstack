@@ -111,7 +111,10 @@ export default function ReportDetailPage() {
         <AlertTriangle className="w-12 h-12 text-destructive" />
         <h2 className="text-xl font-bold">Laporan Tidak Ditemukan</h2>
         <p className="text-muted-foreground">{error}</p>
-        <Button onClick={() => router.back()} variant="outline">
+        <Button
+          onClick={() => router.push("/dashboard/reports")}
+          variant="outline"
+        >
           Kembali
         </Button>
       </div>
