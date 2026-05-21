@@ -1,3 +1,4 @@
+// prisma/seed.ts
 import {
   Role,
   Urgency,
@@ -6,6 +7,92 @@ import {
 } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+
+// ─── HELPER GENERATOR ────────────────────────────────────────────────────────
+const getRandomInt = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
+const getRandomItem = <T>(arr: T[]): T =>
+  arr[Math.floor(Math.random() * arr.length)];
+const getRandomFloat = (min: number, max: number) =>
+  Math.random() * (max - min) + min;
+
+// Data referensi lokasi (Pekanbaru, Jakarta, Surabaya, dll)
+const LOCATIONS = [
+  {
+    provinsi: "Riau",
+    kota: "Pekanbaru",
+    kecamatan: [
+      "Tampan",
+      "Marpoyan Damai",
+      "Bukit Raya",
+      "Payung Sekaki",
+      "Sukajadi",
+    ],
+    kelurahan: [
+      "Simpang Baru",
+      "Sidomulyo",
+      "Tangkerang",
+      "Labuh Baru",
+      "Jadirejo",
+    ],
+    jalan: [
+      "Jl. HR Soebrantas",
+      "Jl. Jend. Sudirman",
+      "Jl. Arifin Ahmad",
+      "Jl. Riau",
+      "Jl. Gajah Mada",
+    ],
+    lat: [0.45, 0.55],
+    lng: [101.4, 101.5],
+  },
+  {
+    provinsi: "DKI Jakarta",
+    kota: "Jakarta Selatan",
+    kecamatan: ["Cilandak", "Kebayoran Baru", "Pasar Minggu", "Tebet"],
+    kelurahan: ["Lebak Bulus", "Senayan", "Pejaten", "Tebet Timur"],
+    jalan: [
+      "Jl. Cilandak KKO",
+      "Jl. Sudirman",
+      "Jl. Casablanca",
+      "Jl. Gatot Subroto",
+    ],
+    lat: [-6.3, -6.22],
+    lng: [106.78, 106.85],
+  },
+  {
+    provinsi: "Jawa Timur",
+    kota: "Surabaya",
+    kecamatan: ["Gayungan", "Bulak", "Wonokromo", "Gubeng"],
+    kelurahan: ["Ketintang", "Kenjeran", "Ngagel", "Airlangga"],
+    jalan: ["Jl. Ahmad Yani", "Jl. Raya Darmo", "Jl. Kenjeran", "Jl. Pemuda"],
+    lat: [-7.35, -7.25],
+    lng: [112.7, 112.8],
+  },
+  {
+    provinsi: "Jawa Barat",
+    kota: "Bandung",
+    kecamatan: ["Coblong", "Lengkong", "Sumur Bandung", "Cicendo"],
+    kelurahan: ["Dago", "Cijagra", "Braga", "Pasirkaliki"],
+    jalan: [
+      "Jl. Ir. H. Djuanda",
+      "Jl. Buah Batu",
+      "Jl. Asia Afrika",
+      "Jl. Pasteur",
+    ],
+    lat: [-6.95, -6.85],
+    lng: [107.55, 107.65],
+  },
+];
+
+const ADJECTIVES = [
+  "parah",
+  "berbahaya",
+  "cukup lebar",
+  "dalam",
+  "mengganggu lalu lintas",
+  "membuat macet",
+  "sering memakan korban",
+];
 
 async function main() {
   console.log("🌱 Mulai seeding database StreetWatch...\n");
@@ -84,7 +171,6 @@ async function main() {
 
   // ─── 2. USERS ──────────────────────────────────────────────────────────────
   console.log("👤 Seeding users...");
-
   const passwordHash = await bcrypt.hash("Password123", 12);
   const adminPasswordHash = await bcrypt.hash("Admin123!", 12);
 
@@ -95,7 +181,6 @@ async function main() {
       password: adminPasswordHash,
       role: Role.ADMIN,
       points: 1500,
-      image: null,
     },
     {
       name: "Ali Musthafa Kamal",
@@ -103,7 +188,6 @@ async function main() {
       password: passwordHash,
       role: Role.CITIZEN,
       points: 620,
-      image: null,
     },
     {
       name: "Firza Hakim",
@@ -111,7 +195,6 @@ async function main() {
       password: passwordHash,
       role: Role.CITIZEN,
       points: 340,
-      image: null,
     },
     {
       name: "Della Nurizki",
@@ -119,7 +202,6 @@ async function main() {
       password: passwordHash,
       role: Role.CITIZEN,
       points: 180,
-      image: null,
     },
     {
       name: "Dzakiya Hakima Adila",
@@ -127,7 +209,6 @@ async function main() {
       password: passwordHash,
       role: Role.CITIZEN,
       points: 95,
-      image: null,
     },
     {
       name: "Alif Budi Setiyawan",
@@ -135,7 +216,6 @@ async function main() {
       password: passwordHash,
       role: Role.CITIZEN,
       points: 50,
-      image: null,
     },
     {
       name: "Rangga Adi",
@@ -143,11 +223,11 @@ async function main() {
       password: passwordHash,
       role: Role.CITIZEN,
       points: 10,
-      image: null,
     },
   ];
 
   const users: Record<string, { id: string }> = {};
+  const userEmails: string[] = [];
   for (const u of usersData) {
     const user = await prisma.user.upsert({
       where: { email: u.email },
@@ -155,408 +235,123 @@ async function main() {
       create: u,
     });
     users[u.email] = user;
+    if (u.role === Role.CITIZEN) userEmails.push(u.email);
   }
   console.log(`   ✅ ${usersData.length} users seeded\n`);
 
-  // ─── 3. REPORTS ────────────────────────────────────────────────────────────
-  console.log("📋 Seeding reports...");
-
+  // ─── 3. REPORTS (100 DATA DUMMY) ───────────────────────────────────────────
+  console.log("📋 Seeding 100 reports...");
+  const TOTAL_REPORTS = 100;
   const now = new Date();
-  const daysAgo = (n: number) =>
-    new Date(now.getTime() - n * 24 * 60 * 60 * 1000);
 
-  const reportsData = [
-    // ── Pekanbaru, Riau
-    {
-      title: "Jalan Sudirman Berlubang Besar",
-      description:
-        "Terdapat lubang besar di Jalan Sudirman dekat pertigaan. Lubang sedalam ±30cm sangat membahayakan pengendara motor pada malam hari karena tidak ada penerangan. Sudah ada 2 motor yang terperosok minggu ini.",
-      address: "Jl. Sudirman No. 45, Pekanbaru",
-      kelurahan: "Jadirejo",
-      kecamatan: "Sukajadi",
-      kota: "Pekanbaru",
-      provinsi: "Riau",
-      lat: 0.5071,
-      lng: 101.4478,
-      urgency: Urgency.high,
-      status: ReportStatus.verified,
-      category: DamageCategory.lubang,
-      imageUrls: [
-        "https://placehold.co/800x600/e74c3c/white?text=Lubang+Jalan",
-      ],
-      upvoteCount: 47,
-      aiScore: 92.5,
-      aiLevel: "tinggi",
-      aiSummary:
-        "Terdeteksi lubang besar dengan kedalaman signifikan. Risiko tinggi bagi pengendara.",
-      analyzedAt: daysAgo(5),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(7),
-    },
-    {
-      title: "Aspal Retak Parah di Jalan Gajah Mada",
-      description:
-        "Aspal di Jalan Gajah Mada mengalami retak-retak memanjang sepanjang ±50 meter. Jika hujan, air menggenang di retakan dan menjadi licin.",
-      address: "Jl. Gajah Mada, Pekanbaru",
-      kelurahan: "Wonorejo",
-      kecamatan: "Marpoyan Damai",
-      kota: "Pekanbaru",
-      provinsi: "Riau",
-      lat: 0.496,
-      lng: 101.4353,
-      urgency: Urgency.high,
-      status: ReportStatus.verified,
-      category: DamageCategory.retak,
-      imageUrls: ["https://placehold.co/800x600/e67e22/white?text=Retak+Aspal"],
-      upvoteCount: 23,
-      aiScore: 85.0,
-      aiLevel: "tinggi",
-      aiSummary:
-        "Retak permukaan luas terdeteksi. Perlu perbaikan segera sebelum musim hujan.",
-      analyzedAt: daysAgo(3),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(10),
-    },
-    {
-      title: "Jalan Ambles di Perumahan Panam",
-      description:
-        "Badan jalan mengalami penurunan (ambles) sekitar 20cm di kawasan Panam. Diduga akibat gorong-gorong bawah tanah yang rusak.",
-      address: "Jl. HR. Soebrantas KM 12, Panam, Pekanbaru",
-      kelurahan: "Tuah Karya",
-      kecamatan: "Tampan",
-      kota: "Pekanbaru",
-      provinsi: "Riau",
-      lat: 0.4534,
-      lng: 101.3801,
-      urgency: Urgency.high,
-      status: ReportStatus.fail,
-      category: DamageCategory.amblas,
-      imageUrls: [
-        "https://placehold.co/800x600/c0392b/white?text=Jalan+Ambles",
-      ],
-      upvoteCount: 38,
-      aiScore: null,
-      aiLevel: null,
-      aiSummary: null,
-      analyzedAt: null,
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(2),
-    },
+  const KATEGORI = Object.values(DamageCategory); // lubang, retak, dll
+  const URGENCY = Object.values(Urgency); // low, medium, high
 
-    // ── Medan, Sumatera Utara
-    {
-      title: "Lubang di Jalan Pemuda Medan",
-      description:
-        "Lubang berdiameter ±1 meter di tengah jalan Pemuda Medan. Sudah ditandai warga dengan bambu tapi belum diperbaiki selama 2 minggu.",
-      address: "Jl. Pemuda No. 12, Medan",
-      kelurahan: "Petisah Tengah",
-      kecamatan: "Medan Petisah",
-      kota: "Medan",
-      provinsi: "Sumatera Utara",
-      lat: 3.5952,
-      lng: 98.6722,
-      urgency: Urgency.high,
-      status: ReportStatus.verified,
-      category: DamageCategory.lubang,
-      imageUrls: [
-        "https://placehold.co/800x600/e74c3c/white?text=Lubang+Medan",
-      ],
-      upvoteCount: 31,
-      aiScore: 88.0,
-      aiLevel: "tinggi",
-      aiSummary: "Lubang berukuran sedang-besar. Perlu penanganan segera.",
-      analyzedAt: daysAgo(4),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(14),
-    },
-    {
-      title: "Jalan Bergelombang di Ring Road Medan",
-      description:
-        "Permukaan jalan ring road luar tidak rata dan bergelombang sepanjang 200 meter. Menyebabkan kendaraan berat sering oleng.",
-      address: "Jl. Ring Road, Medan",
-      kelurahan: "Helvetia",
-      kecamatan: "Medan Helvetia",
-      kota: "Medan",
-      provinsi: "Sumatera Utara",
-      lat: 3.62,
-      lng: 98.63,
-      urgency: Urgency.medium,
-      status: ReportStatus.verified,
-      category: DamageCategory.bergelombang,
-      imageUrls: [
-        "https://placehold.co/800x600/f39c12/white?text=Bergelombang",
-      ],
-      upvoteCount: 15,
-      aiScore: 76.5,
-      aiLevel: "sedang",
-      aiSummary:
-        "Deformasi permukaan terdeteksi. Tidak mengancam jiwa namun perlu perbaikan.",
-      analyzedAt: daysAgo(6),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(20),
-    },
+  const reportsToCreate = Array.from({ length: TOTAL_REPORTS }).map(() => {
+    const loc = getRandomItem(LOCATIONS);
+    const jalan = getRandomItem(loc.jalan);
+    const category = getRandomItem(KATEGORI);
+    const urgency = getRandomItem(URGENCY);
 
-    // ── Jakarta
-    {
-      title: "Longsor Tepi Jalan di Cilandak",
-      description:
-        "Tebing di sisi kiri Jalan Cilandak Raya longsor sekitar 3 meter menutupi sebagian badan jalan. Hanya tersisa 1 lajur.",
-      address: "Jl. Cilandak KKO, Jakarta Selatan",
-      kelurahan: "Cilandak Timur",
-      kecamatan: "Pasar Minggu",
-      kota: "Jakarta Selatan",
-      provinsi: "DKI Jakarta",
-      lat: -6.2888,
-      lng: 106.8172,
-      urgency: Urgency.high,
-      status: ReportStatus.verified,
-      category: DamageCategory.longsor,
-      imageUrls: ["https://placehold.co/800x600/8e44ad/white?text=Longsor"],
-      upvoteCount: 62,
-      aiScore: 96.0,
-      aiLevel: "tinggi",
-      aiSummary:
-        "Longsor signifikan terdeteksi. Menutup sebagian jalur. Penanganan darurat diperlukan.",
-      analyzedAt: daysAgo(1),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(1),
-    },
-    {
-      title: "Retak Memanjang di Jalan Casablanca",
-      description:
-        "Retak memanjang sepanjang 30 meter di Jalan Casablanca arah Kuningan. Lebar retakan sudah mencapai 3cm dan terus melebar.",
-      address: "Jl. Casablanca Raya, Jakarta Selatan",
-      kelurahan: "Tebet Timur",
-      kecamatan: "Tebet",
-      kota: "Jakarta Selatan",
-      provinsi: "DKI Jakarta",
-      lat: -6.2264,
-      lng: 106.8451,
-      urgency: Urgency.high,
-      status: ReportStatus.fail,
-      category: DamageCategory.retak,
-      imageUrls: [
-        "https://placehold.co/800x600/e67e22/white?text=Retak+Jakarta",
-      ],
-      upvoteCount: 19,
-      aiScore: null,
-      aiLevel: null,
-      aiSummary: null,
-      analyzedAt: null,
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(3),
-    },
+    // ─── Status & AI Logic ──────────────────────────────────────────
+    // Status awal dari sistem hanya bisa verified (sukses) atau fail (gagal).
+    const isFail = Math.random() > 0.8; // 20% kemungkinan AI menolak/gagal
+    const status = isFail ? ReportStatus.fail : ReportStatus.verified;
 
-    // ── Surabaya
-    {
-      title: "Lubang Berbahaya di Jalan Ahmad Yani Surabaya",
-      description:
-        "Lubang dalam di tengah jalan Ahmad Yani. Sudah ada 3 kecelakaan kecil dalam seminggu terakhir. Lokasi dekat lampu merah padat.",
-      address: "Jl. Ahmad Yani No. 150, Surabaya",
-      kelurahan: "Gayungan",
-      kecamatan: "Gayungan",
-      kota: "Surabaya",
-      provinsi: "Jawa Timur",
-      lat: -7.3305,
-      lng: 112.7399,
-      urgency: Urgency.high,
-      status: ReportStatus.verified,
-      category: DamageCategory.lubang,
-      imageUrls: [
-        "https://placehold.co/800x600/e74c3c/white?text=Lubang+Surabaya",
-      ],
-      upvoteCount: 54,
-      aiScore: 91.0,
-      aiLevel: "tinggi",
-      aiSummary:
-        "Lubang dalam terdeteksi di area lalu lintas padat. Prioritas tinggi.",
-      analyzedAt: daysAgo(2),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(5),
-    },
-    {
-      title: "Jalan Bergelombang di Kenjeran Surabaya",
-      description:
-        "Seksi jalan Kenjeran dekat Pantai mengalami kerusakan bergelombang. Truk-truk besar sering menghindari jalur ini.",
-      address: "Jl. Kenjeran No. 45, Surabaya",
-      kelurahan: "Bulak",
-      kecamatan: "Bulak",
-      kota: "Surabaya",
-      provinsi: "Jawa Timur",
-      lat: -7.2344,
-      lng: 112.7818,
-      urgency: Urgency.medium,
-      status: ReportStatus.verified,
-      category: DamageCategory.bergelombang,
-      imageUrls: [
-        "https://placehold.co/800x600/f39c12/white?text=Bergelombang+SBY",
-      ],
-      upvoteCount: 11,
-      aiScore: 72.0,
-      aiLevel: "sedang",
-      aiSummary:
-        "Permukaan tidak rata terdeteksi. Dampak sedang pada kendaraan berat.",
-      analyzedAt: daysAgo(8),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(15),
-    },
+    // Hitung probabilitas AI Score berdasarkan urgency jika tidak fail
+    const baseScore = urgency === "high" ? 80 : urgency === "medium" ? 50 : 20;
 
-    // ── Bandung
-    {
-      title: "Aspal Amblas di Jalan Dago Bandung",
-      description:
-        "Badan jalan amblas di kawasan Dago Atas. Dugaan saluran air bawah jalan bocor menyebabkan tanah turun. Sangat berbahaya saat malam.",
-      address: "Jl. Ir. H. Djuanda (Dago) No. 200, Bandung",
-      kelurahan: "Dago",
-      kecamatan: "Coblong",
-      kota: "Bandung",
-      provinsi: "Jawa Barat",
-      lat: -6.8772,
-      lng: 107.6142,
-      urgency: Urgency.high,
-      status: ReportStatus.fail,
-      category: DamageCategory.amblas,
-      imageUrls: [
-        "https://placehold.co/800x600/c0392b/white?text=Amblas+Bandung",
-      ],
-      upvoteCount: 28,
-      aiScore: null,
-      aiLevel: null,
-      aiSummary: null,
-      analyzedAt: null,
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(4),
-    },
-    {
-      title: "Kerusakan Lain-lain di Jalan Buah Batu",
-      description:
-        "Permukaan jalan di Buah Batu mengalami kerusakan campuran: sebagian retak, sebagian berlubang kecil. Kondisi keseluruhan buruk.",
-      address: "Jl. Buah Batu No. 80, Bandung",
-      kelurahan: "Cijagra",
-      kecamatan: "Lengkong",
-      kota: "Bandung",
-      provinsi: "Jawa Barat",
-      lat: -6.938,
-      lng: 107.636,
-      urgency: Urgency.low,
-      status: ReportStatus.verified,
-      category: DamageCategory.lainnya,
-      imageUrls: [
-        "https://placehold.co/800x600/95a5a6/white?text=Kerusakan+Lainnya",
-      ],
-      upvoteCount: 8,
-      aiScore: 65.0,
-      aiLevel: "rendah",
-      aiSummary:
-        "Kerusakan campuran terdeteksi. Tingkat urgensi rendah namun perlu dimonitor.",
-      analyzedAt: daysAgo(10),
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(25),
-    },
-    // Laporan baru tanpa verifikasi
-    {
-      title: "Lubang Kecil di Jalan Diponegoro Pekanbaru",
-      description:
-        "Ada beberapa lubang kecil di Jalan Diponegoro dekat taman kota. Tidak terlalu dalam tapi berpotensi membesar.",
-      address: "Jl. Diponegoro, Pekanbaru",
-      kelurahan: "Sumahilang",
-      kecamatan: "Pekanbaru Kota",
-      kota: "Pekanbaru",
-      provinsi: "Riau",
-      lat: 0.533,
-      lng: 101.4512,
-      urgency: Urgency.low,
-      status: ReportStatus.fail,
-      category: DamageCategory.lubang,
-      imageUrls: [
-        "https://placehold.co/800x600/3498db/white?text=Lubang+Kecil",
-      ],
-      upvoteCount: 5,
-      aiScore: null,
-      aiLevel: null,
-      aiSummary: null,
-      analyzedAt: null,
-      authorEmail: "ali@gmail.com",
-      createdAt: daysAgo(1),
-    },
-  ];
+    const aiScore = isFail
+      ? null
+      : baseScore + getRandomInt(0, 19) + getRandomFloat(0, 1);
 
-  const createdReports: { id: string; title: string }[] = [];
-  for (const r of reportsData) {
-    const { authorEmail, createdAt, ...reportFields } = r;
-    const report = await prisma.report.create({
-      data: {
-        ...reportFields,
-        authorId: users[authorEmail].id,
-        createdAt,
-      },
-    });
-    createdReports.push({ id: report.id, title: report.title });
-  }
-  console.log(`   ✅ ${createdReports.length} reports seeded\n`);
+    const aiLevel = isFail
+      ? null
+      : urgency === "high"
+        ? "Parah"
+        : urgency === "medium"
+          ? "Sedang"
+          : "Ringan";
 
-  // ─── 4. UPVOTES ────────────────────────────────────────────────────────────
+    const aiSummary = isFail
+      ? "Tidak ada kerusakan jalan yang terdeteksi."
+      : `Terdeteksi ${getRandomInt(1, 4)} titik kerusakan (${aiLevel}). Sistem menyarankan perbaikan.`;
+
+    // Tanggal acak dalam 60 hari terakhir
+    const daysAgo = getRandomInt(0, 60);
+    const createdAt = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+
+    // Random Supabase Image (Mocks 1 to 10)
+    const imageNumber = getRandomInt(1, 10);
+    const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/report-images/reports/mock-${imageNumber}.jpg`;
+
+    return {
+      title: `${category.charAt(0).toUpperCase() + category.slice(1)} di ${jalan}`,
+      description: `Terdapat jalan ${category} yang sangat ${getRandomItem(ADJECTIVES)} di sekitar ${jalan}. Mohon segera ditindaklanjuti.`,
+      address: `${jalan} No. ${getRandomInt(1, 150)}`,
+      kelurahan: getRandomItem(loc.kelurahan),
+      kecamatan: getRandomItem(loc.kecamatan),
+      kota: loc.kota,
+      provinsi: loc.provinsi,
+      lat: getRandomFloat(loc.lat[0], loc.lat[1]),
+      lng: getRandomFloat(loc.lng[0], loc.lng[1]),
+      category: category,
+      urgency: urgency,
+      status: status,
+      imageUrl: imageUrl,
+      aiScore: aiScore,
+      aiLevel: aiLevel,
+      aiSummary: aiSummary,
+      upvoteCount: getRandomInt(0, 120),
+      authorId: users[getRandomItem(userEmails)].id,
+      createdAt: createdAt,
+      analyzedAt: createdAt,
+    };
+  });
+
+  await prisma.report.createMany({
+    data: reportsToCreate,
+    skipDuplicates: true,
+  });
+  console.log(`   ✅ 100 reports seeded\n`);
+
+  // ─── 4. UPVOTES DUMMY ──────────────────────────────────────────────────────
   console.log("👍 Seeding upvotes...");
 
-  // Buat upvote per user untuk beberapa laporan
-  const upvotePairs = [
-    { userEmail: "ali@google.com", reportIndex: 3 },
-    { userEmail: "ali@google.com", reportIndex: 1 },
-    { userEmail: "ali@google.com", reportIndex: 6 },
-    { userEmail: "ali@google.com", reportIndex: 0 },
-    { userEmail: "firza@google.com", reportIndex: 2 },
-    { userEmail: "firza@google.com", reportIndex: 7 },
-    { userEmail: "della@google.com", reportIndex: 0 },
-    { userEmail: "della@agoogle.com", reportIndex: 5 },
-    { userEmail: "della@google.com", reportIndex: 9 },
-    { userEmail: "dzakiya@google.com", reportIndex: 1 },
-    { userEmail: "dzakiya@google.com", reportIndex: 4 },
-    { userEmail: "alif@google.com", reportIndex: 0 },
-    { userEmail: "alif@google.com", reportIndex: 3 },
-  ];
-
+  // Ambil semua report yang baru dibuat untuk kita pasangkan upvote-nya
+  const allReports = await prisma.report.findMany({ select: { id: true } });
   let upvoteCount = 0;
-  for (const pair of upvotePairs) {
-    const report = createdReports[pair.reportIndex];
-    if (!report) continue;
-    try {
-      await prisma.upvote.create({
-        data: {
-          userId: users[pair.userEmail].id,
-          reportId: report.id,
-        },
-      });
-      upvoteCount++;
-    } catch {
-      // skip duplicate
+
+  for (const rep of allReports) {
+    // Beri 0 sampai 4 upvote acak per laporan dari user-user citizen
+    const votesToGive = getRandomInt(0, 4);
+    const shuffledUsers = [...userEmails].sort(() => 0.5 - Math.random());
+
+    for (let i = 0; i < votesToGive; i++) {
+      try {
+        await prisma.upvote.create({
+          data: {
+            userId: users[shuffledUsers[i]].id,
+            reportId: rep.id,
+          },
+        });
+        upvoteCount++;
+      } catch {
+        // Abaikan jika upvote duplicate
+      }
     }
   }
   console.log(`   ✅ ${upvoteCount} upvotes seeded\n`);
 
   // ─── 5. USER BADGES ────────────────────────────────────────────────────────
   console.log("🏅 Seeding user badges...");
-
   const userBadgesData = [
-    // Admin — semua badge
     { userEmail: "admin@streetwatch.ai", badgeKey: "pelapor_pertama" },
-    { userEmail: "admin@streetwatch.ai", badgeKey: "pelapor_aktif" },
-    { userEmail: "admin@streetwatch.ai", badgeKey: "warga_peduli" },
-    { userEmail: "admin@streetwatch.ai", badgeKey: "penginspirasi" },
-    { userEmail: "admin@streetwatch.ai", badgeKey: "penjaga_kota" },
     { userEmail: "admin@streetwatch.ai", badgeKey: "pahlawan_kota" },
-
     { userEmail: "ali@gmail.com", badgeKey: "pelapor_pertama" },
     { userEmail: "ali@gmail.com", badgeKey: "warga_peduli" },
-    { userEmail: "ali@gmail.com", badgeKey: "penginspirasi" },
-
     { userEmail: "firza@gmail.com", badgeKey: "pelapor_pertama" },
-    { userEmail: "firza@gmail.com", badgeKey: "warga_peduli" },
-
-    { userEmail: "dzakiya@gmail.com", badgeKey: "pelapor_pertama" },
-
     { userEmail: "della@gmail.com", badgeKey: "pelapor_pertama" },
-
-    { userEmail: "alif@gmail.com", badgeKey: "pelapor_pertama" },
   ];
 
   let badgeCount = 0;
@@ -569,9 +364,7 @@ async function main() {
         },
       });
       badgeCount++;
-    } catch {
-      // skip duplicate
-    }
+    } catch {}
   }
   console.log(`   ✅ ${badgeCount} user badges seeded\n`);
 
@@ -580,18 +373,13 @@ async function main() {
   console.log("✅ Seeding selesai! Ringkasan:");
   console.log(`   • ${badgeData.length} badges`);
   console.log(`   • ${usersData.length} users`);
-  console.log(`   • ${createdReports.length} reports`);
+  console.log(`   • 100 reports`);
   console.log(`   • ${upvoteCount} upvotes`);
   console.log(`   • ${badgeCount} user badges`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
   console.log("🔑 Akun tersedia:");
   console.log("   Admin  → admin@streetwatch.ai  / Admin123!");
-  console.log("   User 1 → ali@gmail.com      / Password123");
-  console.log("   User 2 → firza@gmail.com      / Password123");
-  console.log("   User 3 → della@gmail.com     / Password123");
-  console.log("   User 4 → dzakiya@gmail.com      / Password123");
-  console.log("   User 5 → alif@gmail.com     / Password123");
-  console.log("   User 6 → rangga@gmail.com     / Password123");
+  console.log("   User 1 → ali@gmail.com         / Password123");
 }
 
 main()
