@@ -36,7 +36,7 @@ export default auth((req) => {
   // Sudah login → tidak perlu ke halaman auth
   if (isAuthPage && session) {
     const url = req.nextUrl.clone();
-    url.pathname = "/dashboard/map";
+    url.pathname = "/dashboard/reports";
     return NextResponse.redirect(url);
   }
 
