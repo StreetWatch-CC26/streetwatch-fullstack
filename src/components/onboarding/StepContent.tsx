@@ -1,56 +1,66 @@
-import Image from "next/image";
-import { OnboardingStep } from "./onboarding-data";
+// ── SVG Illustrations ─────────────────────────────────────────────────────────
+
+import { OnboardingStep } from "@/data/onboardingData";
+import {
+  IllustrationReport,
+  IllustrationAI,
+  IllustrationImpact,
+} from "./ilustrationSvg";
+
+const ILLUSTRATIONS = {
+  report: IllustrationReport,
+  ai: IllustrationAI,
+  impact: IllustrationImpact,
+};
+
+// ── StepContent ───────────────────────────────────────────────────────────────
 
 export default function StepContent({ step }: { step: OnboardingStep }) {
+  const Illustration = ILLUSTRATIONS[step.visual];
+
   return (
-    <div className="flex flex-col md:flex-row w-full h-full gap-4 md:gap-12 items-center justify-center">
-      <div className="w-full md:w-1/2 flex justify-center items-center h-[35vh] md:h-auto">
-        {step.imageSrc ? (
-          <div className="relative w-full h-full max-h-75 max-w-75 md:max-w-sm rounded-xl overflow-hidden border bg-secondary items-center justify-center">
-            <Image
-              src={step.imageSrc}
-              alt={step.title}
-              width={600}
-              height={200}
-              className="object-contain p-4"
-              priority
-            />
+    <div className="flex flex-col md:flex-row w-full h-full gap-6 md:gap-14 items-center justify-center">
+      {/* Illustration */}
+      <div className="w-full md:w-1/2 flex justify-center items-center shrink-0">
+        <div className="relative w-full max-w-65 md:max-w-[320px] aspect-280/220">
+          {/* Soft glow behind illustration */}
+          <div className="absolute inset-0 rounded-2xl bg-primary/5 blur-2xl scale-110" />
+          <div className="relative w-full h-full">
+            <Illustration />
           </div>
-        ) : (
-          <div className="w-full h-full max-h-62.5 max-w-62.5 md:max-w-sm bg-secondary rounded-xl border flex items-center justify-center text-foreground font-medium text-sm">
-            [ Gambar: {step.title} ]
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* Bagian Teks (Konten) */}
+      {/* Text */}
       <div className="w-full md:w-1/2 flex flex-col justify-center text-center md:text-left">
-        {step.statusText && (
-          <p className="text-[10px] md:text-xs font-semibold text-foreground/90 tracking-wider mb-2 md:mb-4 uppercase line-clamp-1">
-            {step.statusText}
-          </p>
-        )}
+        {/* Step label */}
+        <div className="inline-flex items-center justify-center md:justify-start gap-2 mb-3">
+          <span className="h-px w-6 bg-primary/40 hidden md:block" />
+          <span className="text-[11px] font-bold tracking-[0.18em] uppercase text-primary/70">
+            {step.subtitle}
+          </span>
+        </div>
 
-        {/* Ukuran font diperkecil sedikit di layar HP */}
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground-90 mb-2 md:mb-4 leading-tight">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-tight tracking-tight mb-3 md:mb-4">
           {step.title}
         </h2>
 
-        <p className="text-sm md:text-base text-foreground/70 leading-relaxed mb-4 md:mb-6">
+        <p className="text-sm md:text-base text-foreground/60 leading-relaxed mb-5 md:mb-6 max-w-md mx-auto md:mx-0">
           {step.description}
         </p>
 
-        {/* Khusus untuk langkah terakhir (List Centang) */}
         {step.listItems && (
-          <div className="flex flex-col gap-2 md:gap-3 text-left">
+          <div className="flex flex-col gap-2.5 max-w-md mx-auto md:mx-0 w-full">
             {step.listItems.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-3 p-3 md:p-4 border rounded-lg bg-background/50"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/6 border border-primary/10"
               >
-                <div className="mt-0.5 text-primary font-bold">✓</div>
-                <p className="text-xs md:text-sm text-foreground-70 leading-tight">
-                  {item}
+                <span className="text-base shrink-0">
+                  <item.icon color="rgba(30,122,61,1)" />
+                </span>
+                <p className="text-xs md:text-sm text-foreground/70 leading-snug text-left">
+                  {item.text}
                 </p>
               </div>
             ))}
