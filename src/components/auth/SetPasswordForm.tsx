@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
+import Image from "next/image";
 
 export default function SetPasswordForm() {
   const { refreshSession } = useAuth();
@@ -71,7 +72,10 @@ export default function SetPasswordForm() {
             Mulai sekarang kamu bisa login menggunakan email dan password.
           </p>
         </div>
-        <Button className="gap-2" onClick={() => router.push("/dashboard/map")}>
+        <Button
+          className="gap-2"
+          onClick={() => router.push("/dashboard/reports")}
+        >
           Ke Dashboard <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
@@ -79,15 +83,31 @@ export default function SetPasswordForm() {
   }
 
   return (
-    <div>
-      <div className="py-5 md:py-10">
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          Set Password
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Tambahkan password agar kamu bisa login tanpa Google.
-        </p>
+    <div className="flex flex-col items-center gap-6 w-full py-5 md:py-10">
+      <div className="relative w-18 h-16 bg-primary/20 dark:bg-primary/90 rounded-lg flex items-center justify-center p-1">
+        <Image
+          src="/images/png_favicon_light.png"
+          alt="StreetWatch Logo"
+          width={100}
+          height={100}
+          className="hidden dark:block"
+        />
+        <Image
+          src="/images/png_favicon_dark.png"
+          alt="StreetWatch Logo"
+          width={100}
+          height={100}
+          className="block dark:hidden"
+        />
       </div>
+      <h1 className="font-heading text-2xl font-bold text-foreground">
+        Set Password
+      </h1>
+      <p className="text-sm text-muted-foreground mt-1 text-center">
+        Tambahkan password
+        <br />
+        agar kamu bisa login tanpa Google.
+      </p>
 
       {error && (
         <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/8 px-3 py-2.5 text-sm text-destructive">
@@ -208,7 +228,7 @@ export default function SetPasswordForm() {
           type="button"
           variant="ghost"
           className="w-full text-xs text-muted-foreground"
-          onClick={() => router.push("/dashboard/map")}
+          onClick={() => router.push("/dashboard/reports")}
         >
           Lewati, set nanti
         </Button>

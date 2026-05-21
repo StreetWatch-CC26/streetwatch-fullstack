@@ -5,16 +5,17 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { MapPin, Mail, Lock, AlertCircle } from "lucide-react";
+import { Mail, Lock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
+import Image from "next/image";
 
 export default function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") ?? "/dashboard/map";
+  const callbackUrl = params.get("callbackUrl") ?? "/dashboard/reports";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,11 +53,24 @@ export default function LoginForm() {
     <div>
       {/* Brand */}
       <div className="flex flex-col items-center gap-2 py-5 md:py-10">
-        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-          <MapPin className="w-5 h-5 text-primary-foreground" />
+        <div className="relative w-18 h-16 bg-primary/20 dark:bg-primary/90 rounded-lg flex items-center justify-center p-1">
+          <Image
+            src="/images/png_favicon_light.png"
+            alt="StreetWatch Logo"
+            width={100}
+            height={100}
+            className="hidden dark:block"
+          />
+          <Image
+            src="/images/png_favicon_dark.png"
+            alt="StreetWatch Logo"
+            width={100}
+            height={100}
+            className="block dark:hidden"
+          />
         </div>
         <h1 className="font-heading text-2xl font-bold text-foreground">
-          Street<span className="text-primary">Watch</span>
+          Street<span className="text-primary">Watch AI</span>
         </h1>
         <p className="text-sm text-muted-foreground">Masuk ke akun kamu</p>
       </div>
