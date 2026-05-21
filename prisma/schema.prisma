@@ -68,7 +68,7 @@ model VerificationToken {
 model Report {
   id          String         @id @default(cuid())
   title       String
-  description String
+  description String?
   address     String
   kelurahan   String?
   kecamatan   String?
@@ -81,6 +81,7 @@ model Report {
   category    DamageCategory
   imageUrl    String
   upvoteCount Int            @default(0)
+  isUpvoteRewardClaimed Boolean @default(false)
   aiScore     Float?
   aiLevel     String?
   aiSummary   String?
