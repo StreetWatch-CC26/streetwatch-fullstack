@@ -77,9 +77,8 @@ export function BadgesTab() {
         <div className="space-y-2">
           {[
             { action: "Membuat laporan baru", pts: "+50 poin" },
-            { action: "Laporan terverifikasi", pts: "+30 poin" },
-            { action: "Laporan diselesaikan", pts: "+100 poin" },
-            { action: "Laporan mendapat 10 upvote", pts: "+20 poin" },
+            { action: "Laporan terverifikasi", pts: "+50 poin" },
+            { action: "Laporan mendapat 20 upvote", pts: "+100 poin" },
           ].map((item) => (
             <div
               key={item.action}
