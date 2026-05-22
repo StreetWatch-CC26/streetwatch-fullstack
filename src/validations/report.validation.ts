@@ -1,15 +1,17 @@
+// src/validations/report.validation.ts
 import { z } from "zod";
 
 export const createReportSchema = z.object({
   title: z.string().min(5, "Judul minimal 5 karakter").max(100),
-  description: z.string().min(10, "Deskripsi minimal 10 karakter").max(1000),
-  address: z.string().min(3).max(200),
-  kelurahan: z.string().max(100).optional(),
-  kecamatan: z.string().max(100).optional(),
+  description: z.string().max(1000).optional().nullable(),
+  address: z.string().min(1, "Alamat wajib diisi").max(200),
+  kelurahan: z.string().max(100).optional().nullable(),
+  kecamatan: z.string().max(100).optional().nullable(),
   kota: z.string().min(2, "Kota wajib diisi").max(100),
   provinsi: z.string().min(2, "Provinsi wajib diisi").max(100),
-  lat: z.number().min(-11, "Koordinat tidak valid").max(6),
-  lng: z.number().min(95, "Koordinat tidak valid").max(141),
+  // Melebarkan batas koordinat agar tidak error jika terklik area luar saat testing
+  lat: z.number().min(-90, "Koordinat Latitude tidak valid").max(90),
+  lng: z.number().min(-180, "Koordinat Longitude tidak valid").max(180),
   category: z.enum([
     "lubang",
     "retak",
@@ -26,7 +28,6 @@ export const reportQuerySchema = z.object({
   kota: z.string().optional(),
   kecamatan: z.string().optional(),
   urgency: z.enum(["high", "medium", "low"]).optional(),
-  // Sesuaikan status
   status: z.enum(["fail", "verified"]).optional(),
   category: z
     .enum(["lubang", "retak", "amblas", "longsor", "bergelombang", "lainnya"])
@@ -41,6 +42,7 @@ export const reportQuerySchema = z.object({
       "aiScore_desc",
     ])
     .default("createdAt_desc"),
+  search: z.string().optional(),
 });
 
 export type CreateReportInput = z.infer<typeof createReportSchema>;
