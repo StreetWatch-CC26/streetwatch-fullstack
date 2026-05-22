@@ -1,22 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-/**
- * components/dashboard/LeafletMap.tsx
- *
- * - Leaflet map dengan Marker Cluster (leaflet.markercluster via CDN)
- * - Cluster otomatis merge saat zoom out, expand saat zoom in
- * - Strict Mode safe: isMounted guard + _leaflet_id cleanup
- * - centerOn prop: flyTo saat filter wilayah berubah
- */
-
+import { Urgency } from "@/generated/prisma/enums";
 import { useEffect, useRef } from "react";
-import type { Report, Urgency } from "@/data/mock-reports";
+
+export interface MapMarkerData {
+  id: string;
+  lat: number;
+  lng: number;
+  urgency: Urgency;
+}
 
 const URGENCY_HEX: Record<Urgency, string> = {
   high: "#ef4444",
   medium: "#eab308",
   low: "#22c55e",
+};
+
+/**
+ * Urutan prioritas: high > medium > low
+ * Cluster mengambil warna urgency tertinggi dari child-nya.
+ */
+const URGENCY_PRIORITY: Record<Urgency, number> = {
+  high: 3,
+  medium: 2,
+  low: 1,
+};
+
+/** Warna ring/glow per urgency untuk cluster aktif */
+const URGENCY_GLOW: Record<Urgency, string> = {
+  high: "rgba(239,68,68,0.35)",
+  medium: "rgba(234,179,8,0.35)",
+  low: "rgba(34,197,94,0.35)",
 };
 
 interface MapCenter {
@@ -26,17 +41,19 @@ interface MapCenter {
 }
 
 interface Props {
-  reports: Report[];
+  reports: MapMarkerData[];
   selectedId: string | null;
-  onSelect: (r: Report) => void;
+  onSelect: (r: MapMarkerData) => void;
   centerOn?: MapCenter;
 }
+
+// ── Default: seluruh Indonesia ────────────────────────────────────────────────
+const INDONESIA_CENTER = { lat: -2.5, lng: 118, zoom: 5 };
 
 // ── Icon factory ───────────────────────────────────────────────────────────────
 function pinIcon(L: any, color: string, selected: boolean) {
   const width = selected ? 40 : 32;
   const height = selected ? 52 : 42;
-
   const anchorY = height * (38 / 42);
 
   return L.divIcon({
@@ -53,14 +70,12 @@ function pinIcon(L: any, color: string, selected: boolean) {
             ? `<circle cx="16" cy="16" r="14" fill="${color}" opacity="0.3" />`
             : ""
         }
-        
         <path 
           d="M16 4 C9.37 4 4 9.37 4 16 c0 7.75 12 22 12 22 s12 -14.25 12 -22 C28 9.37 22.63 4 16 4 Z" 
           fill="${color}" 
           stroke="white" 
           stroke-width="2.5" 
         />
-        
         <circle cx="16" cy="16" r="4.5" fill="white" />
       </svg>
     `,
@@ -70,7 +85,82 @@ function pinIcon(L: any, color: string, selected: boolean) {
   });
 }
 
-// ── Inject external CSS once ───────────────────────────────────────────────────
+/**
+ * Buat cluster icon dengan warna dominan berdasarkan urgency tertinggi
+ * di antara semua child marker dalam cluster.
+ */
+function clusterIcon(
+  L: any,
+  cluster: any,
+  markerUrgencyMap: Map<string, Urgency>,
+) {
+  const count = cluster.getChildCount();
+  const children: any[] = cluster.getAllChildMarkers();
+
+  // Tentukan urgency dominan dari child markers
+  let dominantUrgency: Urgency = "low";
+  let highestPriority = 0;
+
+  children.forEach((marker: any) => {
+    const urgency = marker._urgency as Urgency | undefined;
+    if (urgency) {
+      const priority = URGENCY_PRIORITY[urgency];
+      if (priority > highestPriority) {
+        highestPriority = priority;
+        dominantUrgency = urgency;
+      }
+    }
+  });
+
+  const color = URGENCY_HEX[dominantUrgency];
+  const glow = URGENCY_GLOW[dominantUrgency];
+
+  // Ukuran responsif: lebih besar untuk touch
+  const size = count > 50 ? 48 : count > 10 ? 42 : 36;
+  const fontSize = count > 99 ? 10 : count > 9 ? 12 : 13;
+
+  return L.divIcon({
+    html: `
+      <div style="
+        position: relative;
+        width: ${size}px;
+        height: ${size}px;
+      ">
+        <!-- Outer glow ring -->
+        <div style="
+          position: absolute;
+          inset: -4px;
+          border-radius: 50%;
+          background: ${glow};
+          animation: pulse-ring 2s ease-out infinite;
+        "></div>
+        <!-- Main circle -->
+        <div style="
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: ${color};
+          border: 2.5px solid white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: ${fontSize}px;
+          font-weight: 700;
+          font-family: ui-monospace, monospace;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+          letter-spacing: -0.5px;
+        ">
+          ${count > 99 ? "99+" : count}
+        </div>
+      </div>
+    `,
+    className: "leaflet-cluster-urgency",
+    iconSize: [size + 8, size + 8],
+    iconAnchor: [(size + 8) / 2, (size + 8) / 2],
+  });
+}
+
 function injectCSS(href: string, id: string) {
   if (document.getElementById(id)) return;
   const el = document.createElement("link");
@@ -78,6 +168,25 @@ function injectCSS(href: string, id: string) {
   el.rel = "stylesheet";
   el.href = href;
   document.head.appendChild(el);
+}
+
+function injectPulseKeyframe() {
+  const id = "cluster-pulse-style";
+  if (document.getElementById(id)) return;
+  const style = document.createElement("style");
+  style.id = id;
+  style.textContent = `
+    @keyframes pulse-ring {
+      0%   { transform: scale(0.9); opacity: 0.7; }
+      70%  { transform: scale(1.3); opacity: 0; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+    .leaflet-cluster-urgency {
+      background: transparent !important;
+      border: none !important;
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 export default function LeafletMap({
@@ -88,16 +197,19 @@ export default function LeafletMap({
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
-  const clusterRef = useRef<any>(null); // MarkerClusterGroup
+  const clusterRef = useRef<any>(null);
   const markersRef = useRef<Map<string, any>>(new Map());
   const LRef = useRef<any>(null);
+  /** Cache urgency per marker id untuk cluster color logic */
+  const markerUrgencyMap = useRef<Map<string, Urgency>>(new Map());
 
-  // ── Init ────────────────────────────────────────────────────────────────────
+  // 1. Inisialisasi Peta
   useEffect(() => {
     const el = containerRef.current;
+    const currentMarkers = markersRef.current;
+
     if (!el) return;
 
-    // Strict Mode guard
     if ((el as any)._leaflet_id) delete (el as any)._leaflet_id;
     if (mapRef.current) return;
 
@@ -115,17 +227,15 @@ export default function LeafletMap({
       "https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css",
       "mc-default-css",
     );
+    injectPulseKeyframe();
 
-    // Load Leaflet first, then the cluster plugin (needs L on window)
     import("leaflet").then((LeafletModule) => {
       if (!alive || !containerRef.current) return;
 
       const L = LeafletModule.default || LeafletModule;
-
       LRef.current = L;
-      (window as any).L = L; // cluster plugin WAJIB baca raw object ini
+      (window as any).L = L;
 
-      // Load cluster plugin dynamically
       const script = document.createElement("script");
       script.src =
         "https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js";
@@ -136,12 +246,14 @@ export default function LeafletMap({
           delete (containerRef.current as any)._leaflet_id;
 
         const map = L.map(containerRef.current, {
-          center: [-2.5, 118],
-          zoom: 5,
+          // Default: tampilan seluruh Indonesia
+          center: [INDONESIA_CENTER.lat, INDONESIA_CENTER.lng],
+          zoom: INDONESIA_CENTER.zoom,
           zoomControl: false,
           attributionControl: false,
         });
 
+        // Zoom control → kanan atas, lebih jauh dari edge agar tidak nabrak notch
         L.control.zoom({ position: "topright" }).addTo(map);
         L.control
           .attribution({ position: "bottomleft", prefix: false })
@@ -152,34 +264,24 @@ export default function LeafletMap({
           maxZoom: 19,
         }).addTo(map);
 
-        // MarkerClusterGroup — merge at zoom out, expand at zoom in
         const cluster = (L as any).markerClusterGroup({
           showCoverageOnHover: false,
           maxClusterRadius: 50,
-          iconCreateFunction: (c: any) => {
-            const count = c.getChildCount();
-            const size = count > 50 ? 44 : count > 10 ? 38 : 32;
-            return L.divIcon({
-              html: `<div style="
-                width:${size}px;height:${size}px;border-radius:50%;
-                background:oklch(0.511 0.096 186.391);
-                border:2.5px solid white;
-                display:flex;align-items:center;justify-content:center;
-                color:white;font-size:11px;font-weight:700;
-                box-shadow:0 2px 8px rgba(0,0,0,0.25);">
-                  ${count}
-              </div>`,
-              className: "",
-              iconSize: [size, size],
-            });
-          },
+          // Gunakan urgency-aware cluster icon
+          iconCreateFunction: (c: any) =>
+            clusterIcon(L, c, markerUrgencyMap.current),
+          // Tap-friendly: animasi lebih cepat di mobile
+          animate: true,
+          animateAddingMarkers: false,
+          spiderfyOnMaxZoom: true,
+          // Jarak spiderfy lebih besar untuk touch
+          spiderfyDistanceMultiplier: 1.5,
         });
 
         mapRef.current = map;
         clusterRef.current = cluster;
         map.addLayer(cluster);
 
-        // Add initial markers
         reports.forEach((r) => addMarker(L, cluster, r, r.id === selectedId));
       };
       document.head.appendChild(script);
@@ -190,25 +292,32 @@ export default function LeafletMap({
       mapRef.current?.remove();
       mapRef.current = null;
       clusterRef.current = null;
-      markersRef.current.clear();
+      currentMarkers.clear();
+      markerUrgencyMap.current.clear();
       LRef.current = null;
-      if (containerRef.current)
-        delete (containerRef.current as any)._leaflet_id;
+      if (el) delete (el as any)._leaflet_id;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Helper: add a single marker to cluster ─────────────────────────────────
-  function addMarker(L: any, cluster: any, r: Report, selected: boolean) {
+  function addMarker(
+    L: any,
+    cluster: any,
+    r: MapMarkerData,
+    selected: boolean,
+  ) {
     const marker = L.marker([r.lat, r.lng], {
       icon: pinIcon(L, URGENCY_HEX[r.urgency], selected),
     });
+    // Simpan urgency di marker object agar bisa dibaca iconCreateFunction
+    marker._urgency = r.urgency;
     marker.on("click", () => onSelect(r));
     cluster.addLayer(marker);
     markersRef.current.set(r.id, marker);
+    markerUrgencyMap.current.set(r.id, r.urgency);
   }
 
-  // ── Sync markers when reports change ───────────────────────────────────────
+  // 2. Sinkronisasi Marker saat data "reports" berubah
   useEffect(() => {
     const L = LRef.current;
     const cluster = clusterRef.current;
@@ -216,15 +325,16 @@ export default function LeafletMap({
 
     const current = new Set(reports.map((r) => r.id));
 
-    // Remove stale
+    // Hapus marker yang tidak ada di data terbaru
     markersRef.current.forEach((m, id) => {
       if (!current.has(id)) {
         cluster.removeLayer(m);
         markersRef.current.delete(id);
+        markerUrgencyMap.current.delete(id);
       }
     });
 
-    // Add new
+    // Tambah marker baru
     reports.forEach((r) => {
       if (!markersRef.current.has(r.id))
         addMarker(L, cluster, r, r.id === selectedId);
@@ -232,7 +342,7 @@ export default function LeafletMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reports]);
 
-  // ── Update selected marker icon ────────────────────────────────────────────
+  // 3. Update icon selected
   useEffect(() => {
     const L = LRef.current;
     if (!L) return;
@@ -241,6 +351,7 @@ export default function LeafletMap({
       if (!r) return;
       marker.setIcon(pinIcon(L, URGENCY_HEX[r.urgency], id === selectedId));
     });
+
     if (selectedId) {
       const r = reports.find((x) => x.id === selectedId);
       if (r && mapRef.current)
@@ -253,13 +364,30 @@ export default function LeafletMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
-  // ── flyTo when filter changes ──────────────────────────────────────────────
+  // 4. Center Map saat dropdown wilayah berubah
   useEffect(() => {
-    if (!centerOn || !mapRef.current) return;
-    mapRef.current.flyTo([centerOn.lat, centerOn.lng], centerOn.zoom, {
-      duration: 0.9,
-    });
+    if (!mapRef.current) return;
+
+    if (centerOn) {
+      mapRef.current.flyTo([centerOn.lat, centerOn.lng], centerOn.zoom, {
+        duration: 0.9,
+      });
+    } else {
+      // Reset ke Indonesia jika filter wilayah di-clear
+      mapRef.current.flyTo(
+        [INDONESIA_CENTER.lat, INDONESIA_CENTER.lng],
+        INDONESIA_CENTER.zoom,
+        { duration: 0.9 },
+      );
+    }
   }, [centerOn]);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full"
+      // Hint browser untuk optimasi touch rendering
+      style={{ touchAction: "pan-x pan-y" }}
+    />
+  );
 }
