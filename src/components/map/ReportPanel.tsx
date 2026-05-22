@@ -28,39 +28,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Report } from "@/generated/prisma/browser";
-
-// ─── Label / colour maps ──────────────────────────────────────────────────────
-
-const URGENCY_LABEL = {
-  high: "Tinggi",
-  medium: "Sedang",
-  low: "Rendah",
-} as const;
-const STATUS_LABEL = {
-  fail: "Analisis Gagal",
-  verified: "Terverifikasi",
-} as const;
-const CATEGORY_LABEL = {
-  lubang: "Lubang",
-  retak: "Retak",
-  amblas: "Amblas",
-  longsor: "Longsor",
-  bergelombang: "Bergelombang",
-  lainnya: "Lainnya",
-} as const;
-
-const URGENCY_COLOR: Record<string, string> = {
-  high: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  medium:
-    "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-  low: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-};
-const STATUS_COLOR: Record<string, string> = {
-  fail: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-  verified: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-};
-
-// ─── Component ────────────────────────────────────────────────────────────────
+import {
+  CATEGORY_LABEL,
+  STATUS_COLOR,
+  STATUS_LABEL,
+  URGENCY_COLOR,
+  URGENCY_LABEL,
+} from "@/lib/constants";
 
 interface Props {
   report: Report;
@@ -77,7 +51,6 @@ export function ReportPanel({
   onVote,
   onClose,
 }: Props) {
-  // Close on Escape
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -90,7 +63,7 @@ export function ReportPanel({
     if (navigator.share) {
       navigator.share({
         title: report.title,
-        text: report.description,
+        text: report.description || "Lihat laporan ini di StreetWatch",
         url: window.location.href,
       });
     } else {
@@ -98,23 +71,24 @@ export function ReportPanel({
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const displayImage = report.imageUrl || (report as any).imageUrls?.[0];
+
   return (
     <>
-      {/* Mobile backdrop */}
       <div
-        className="md:hidden fixed inset-0 bg-black/25 backdrop-blur-[2px] z-450"
+        className="md:hidden fixed inset-0 bg-black/25 backdrop-blur-[2px] z-9998"
         onClick={onClose}
       />
 
       <div
         className={cn(
-          "fixed md:absolute z-460",
+          "fixed md:absolute z-9999",
           "bottom-0 left-0 right-0 rounded-t-2xl",
           "md:bottom-4 md:right-4 md:left-auto md:w-80 md:rounded-2xl",
           "bg-background border border-border",
           "shadow-2xl shadow-black/15",
           "animate-in slide-in-from-bottom-4 duration-250",
-          // Tambahkan max-height agar bisa di-scroll jika konten (terutama gambar) terlalu panjang di HP kecil
           "max-h-[90vh] flex flex-col",
         )}
       >
@@ -154,10 +128,10 @@ export function ReportPanel({
         {/* Body (Scrollable) */}
         <div className="px-4 py-3 space-y-3 overflow-y-auto overscroll-contain">
           {/* ─── Image Section ─── */}
-          {report.imageUrl ? (
+          {displayImage ? (
             <div className="relative w-full h-36 md:h-40 rounded-lg overflow-hidden border border-border shrink-0 bg-muted">
               <Image
-                src={report.imageUrl}
+                src={displayImage}
                 alt={`Foto laporan: ${report.title}`}
                 fill
                 className="object-cover transition-transform duration-500 hover:scale-105"
@@ -165,7 +139,7 @@ export function ReportPanel({
               />
             </div>
           ) : (
-            // Placeholder
+            // Placeholder jika benar-benar tidak ada gambar di database
             <div className="w-full h-12 rounded-lg border border-dashed border-border bg-muted/50 flex items-center justify-center gap-2 text-muted-foreground shrink-0">
               <ImageIcon className="w-4 h-4 opacity-50" />
               <span className="text-xs font-medium opacity-50">
@@ -189,7 +163,7 @@ export function ReportPanel({
 
           {/* Description */}
           <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-            {report.description}
+            {report.description || "Tidak ada deskripsi."}
           </p>
 
           {/* Tags */}
