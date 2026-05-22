@@ -440,7 +440,7 @@ streetwatch-fe
 - Buat laporan dengan GPS + prefill dari AI
 - Profil dengan badge dan sistem poin
 
-### v1.1 — Backend Integration 🔄 (Berikutnya)
+### v1.1 — Backend Integration ✅ (Saat Ini)
 
 - Autentikasi (NextAuth.js / Supabase Auth)
 - Database PostgreSQL via Prisma ORM
@@ -484,7 +484,7 @@ Konvensi commit mengikuti [Conventional Commits](https://www.conventionalcommits
 
 ## Tim
 
-Dikembangkan oleh tim **Capstone 2026** dari Coding Camp — sekelompok developer yang percaya bahwa teknologi dapat memperbaiki pelayanan publik Indonesia.
+Dikembangkan oleh tim **StreetWatch - Capstone 2026** dari Coding Camp — sekelompok developer yang percaya bahwa teknologi dapat memperbaiki pelayanan publik Indonesia.
 
 ---
 
