@@ -6,21 +6,26 @@ import {
   reportQuerySchema,
 } from "@/validations/report.validation";
 import {
+  MLNotRoadError,
+  MLServiceError,
+  MLNoDamageError,
+} from "@/services/ml.service";
+import {
   ok,
   created,
   badRequest,
   unauthorized,
   serverError,
+  unprocessableEntity,
+  serviceUnavailable,
 } from "@/lib/api-response";
 
 // GET /api/reports — Mengambil daftar laporan (bisa diakses publik)
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
-    // Ubah searchParams menjadi object biasa
     const queryParams = Object.fromEntries(searchParams.entries());
 
-    // Validasi query (pagination, filter, sort)
     const query = reportQuerySchema.safeParse(queryParams);
     if (!query.success) {
       return badRequest(
@@ -31,7 +36,6 @@ export async function GET(req: NextRequest) {
 
     const { page, limit, sort, ...filters } = query.data;
 
-    // Panggil service untuk get data dari DB
     const { data, total } = await reportService.getAll(filters, {
       page,
       limit,
@@ -55,7 +59,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/reports — Membuat laporan baru (wajib login)
+// POST /api/reports — Membuat laporan baru
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return unauthorized("Anda harus login untuk membuat laporan");
@@ -63,7 +67,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Validasi payload body
     const parsed = createReportSchema.safeParse(body);
     if (!parsed.success) {
       return badRequest(
@@ -72,11 +75,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Panggil service create (Service ini akan memanggil DB lalu trigger FastAPI AI)
-    const report = await reportService.create(session.user.id, parsed.data);
+    const report = await reportService.create(
+      session.user.id,
+      parsed.data,
+      req.signal,
+    );
 
     return created(report);
   } catch (err) {
+    // 422 Unprocessable Entity - Kegagalan validasi gambar (Bukan jalan ATAU tidak ada rusak)
+    if (err instanceof MLNotRoadError || err instanceof MLNoDamageError) {
+      return unprocessableEntity(err.message);
+    }
+
+    // 503 Service Unavailable - Masalah koneksi / server AI down
+    if (err instanceof MLServiceError) {
+      console.error("[POST /api/reports] ML error:", err.message);
+      return serviceUnavailable(err.message);
+    }
+
+    // 500 Internal Server Error - Error tak terduga lainnya
     console.error("[POST /api/reports]", err);
     return serverError("Gagal menyimpan laporan");
   }
