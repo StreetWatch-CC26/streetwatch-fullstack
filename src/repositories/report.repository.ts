@@ -13,6 +13,7 @@ export interface ReportFilters {
   urgency?: Urgency;
   status?: ReportStatus;
   category?: DamageCategory;
+  search?: string;
 }
 
 export interface PaginationOptions {
@@ -55,9 +56,17 @@ export const reportRepository = {
       ...(filters.urgency && { urgency: filters.urgency }),
       ...(filters.status && { status: filters.status }),
       ...(filters.category && { category: filters.category }),
+      ...(filters.search && {
+        OR: [
+          { title: { contains: filters.search, mode: "insensitive" } },
+          { description: { contains: filters.search, mode: "insensitive" } },
+          { kota: { contains: filters.search, mode: "insensitive" } },
+        ],
+      }),
     };
 
-    const skip = (pagination.page - 1) * pagination.limit;
+    const currentPage = Math.max(1, pagination.page);
+    const skip = (currentPage - 1) * pagination.limit;
 
     const [data, total] = await Promise.all([
       prisma.report.findMany({
@@ -155,6 +164,13 @@ export const reportRepository = {
     return prisma.report.update({
       where: { id },
       data: { upvoteCount: { increment: delta } },
+    });
+  },
+
+  async markUpvoteRewardClaimed(id: string) {
+    return prisma.report.update({
+      where: { id },
+      data: { isUpvoteRewardClaimed: true },
     });
   },
 
