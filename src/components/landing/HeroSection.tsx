@@ -167,7 +167,9 @@ export function HeroSection(isLoggedIn: boolean) {
                 },
                 {
                   icon: Scan,
-                  label: "Dideteksi AI",
+                  label: "Akurasi Deteksi AI",
+                  //TODO: Tanya tim AI berapa nilai f1-Score / maP
+                  // Contoh teks: "Didukung oleh AI Vision dengan akurasi deteksi hingga 94.5%."
                   value: "94% akurat",
                   color: "text-blue-500",
                 },
