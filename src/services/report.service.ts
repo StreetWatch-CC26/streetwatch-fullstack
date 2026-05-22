@@ -1,10 +1,11 @@
+// src/services/report.service.ts
 import { reportRepository } from "@/repositories/report.repository";
-import { analyzeImageWithFastAPI } from "@/services/fastapi.service";
+import { analyzeImageWithML, MLNoDamageError } from "@/services/ml.service";
+import { gamificationService } from "@/services/gamification.service";
 import type {
   ReportFilters,
   PaginationOptions,
 } from "@/repositories/report.repository";
-import type { ReportStatus } from "@/generated/prisma/enums";
 import { CreateReportInput } from "@/validations/report.validation";
 
 export const reportService = {
@@ -25,32 +26,27 @@ export const reportService = {
     return report;
   },
 
-  async create(authorId: string, data: CreateReportInput) {
-    let aiData = {};
-    let status: ReportStatus = "fail";
+  async create(
+    authorId: string,
+    data: CreateReportInput,
+    signal?: AbortSignal,
+  ) {
+    const finalCategory = data.category;
 
-    let finalCategory = data.category;
+    const ai = await analyzeImageWithML(data.imageUrl, signal);
 
-    try {
-      // ⬅️ Kirim imageUrl tunggal ke ML
-      const ai = await analyzeImageWithFastAPI(data.imageUrl);
-
-      status = "verified";
-      finalCategory =
-        (ai.category as CreateReportInput["category"]) || finalCategory;
-
-      aiData = {
-        aiScore: ai.score,
-        aiLevel: ai.level,
-        aiSummary: ai.summary,
-        analyzedAt: new Date(),
-      };
-    } catch (error) {
-      console.error("[FastAPI analyze failed]", error);
-      status = "fail";
+    if (!ai.isDamageDetected) {
+      throw new MLNoDamageError();
     }
 
-    return reportRepository.create({
+    const aiData = {
+      aiScore: ai.overallConfidence,
+      aiLevel: ai.rawSeverity,
+      aiSummary: `Terdeteksi ${ai.totalPotholes} titik kerusakan jalan dengan tingkat keparahan ${ai.rawSeverity}.`,
+      analyzedAt: new Date(),
+    };
+
+    const report = await reportRepository.create({
       title: data.title,
       description: data.description,
       address: data.address,
@@ -62,10 +58,16 @@ export const reportService = {
       lng: data.lng,
       category: finalCategory,
       imageUrl: data.imageUrl,
-      status: status,
+      status: "verified",
       ...aiData,
       author: { connect: { id: authorId } },
     });
+
+    await gamificationService.awardPoints(authorId, 100).catch((err) => {
+      console.error("Gagal memberikan poin:", err);
+    });
+
+    return report;
   },
 
   async updateStatus(
