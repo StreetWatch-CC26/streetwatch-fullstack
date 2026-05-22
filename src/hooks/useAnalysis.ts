@@ -1,48 +1,15 @@
+// hooks/useAnalysis.ts
 "use client";
 
-/**
- * hooks/useAnalysis.ts
- *
- * Orkestrasi lengkap:
- * 1. Terima file gambar dari user
- * 2. Baca sebagai base64
- * 3. Jalankan mock analysis dengan phase tracking
- * 4. Simpan hasil ke Zustand store
- */
-
 import { useState, useCallback } from "react";
-import {
-  runMockAnalysis,
-  type AnalysisPhase,
-  type AnalysisResult,
-} from "@/data/analysisSchema";
+import type { AnalysisPhase, AnalysisResult } from "@/data/analysisSchema";
+import { RECOMMENDATIONS } from "@/data/analysisSchema";
 import { useAnalysisStore } from "@/stores/analysis.store";
-
-export type { AnalysisPhase };
-
-interface UseAnalysis {
-  /** Currently loaded image file */
-  file: File | null;
-  /** Object URL / base64 preview for <img> */
-  preview: string | null;
-  /** Current processing phase */
-  phase: AnalysisPhase;
-  /** Final analysis result (null until done) */
-  result: AnalysisResult | null;
-  /** Error message if phase === "error" */
-  errorMsg: string | null;
-
-  /** Load a new image (does not auto-analyze) */
-  loadImage: (f: File) => void;
-  /** Start analysis on loaded image */
-  analyze: () => Promise<void>;
-  /** Reset everything */
-  reset: () => void;
-}
+import type { MLAnalysisResult } from "@/services/ml.service";
 
 const MAX_SIZE_MB = 10;
 
-export function useAnalysis(): UseAnalysis {
+export function useAnalysis() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [phase, setPhase] = useState<AnalysisPhase>("idle");
@@ -51,7 +18,6 @@ export function useAnalysis(): UseAnalysis {
 
   const { setAnalysis } = useAnalysisStore();
 
-  // ── Load image file ──────────────────────────────────────────────────────────
   const loadImage = useCallback((f: File) => {
     if (!f.type.startsWith("image/")) {
       setErrorMsg("File harus berupa gambar (JPG, PNG, WEBP).");
@@ -59,7 +25,7 @@ export function useAnalysis(): UseAnalysis {
       return;
     }
     if (f.size > MAX_SIZE_MB * 1024 * 1024) {
-      setErrorMsg(`Ukuran gambar maksimal ${MAX_SIZE_MB} MB.`);
+      setErrorMsg(`Ukuran maksimal ${MAX_SIZE_MB} MB.`);
       setPhase("error");
       return;
     }
@@ -74,28 +40,59 @@ export function useAnalysis(): UseAnalysis {
     reader.readAsDataURL(f);
   }, []);
 
-  // ── Run analysis ─────────────────────────────────────────────────────────────
   const analyze = useCallback(async () => {
     if (!file || !preview) return;
     setResult(null);
     setErrorMsg(null);
 
     try {
-      const res = await runMockAnalysis(preview, setPhase);
-      setResult(res);
-      // Persist to store so report/new can consume without re-analyze
-      setAnalysis(res, preview, file.name);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setErrorMsg(err?.message ?? "Analisis gagal. Coba lagi.");
-      } else {
-        console.log("Terjadi error yang tidak diketahui", err);
-      }
+      // 1. Upload Gambar
+      setPhase("uploading");
+      const fd = new FormData();
+      fd.append("image", file);
+
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: fd,
+      });
+      const uploadJson = await uploadRes.json();
+
+      if (!uploadRes.ok)
+        throw new Error(uploadJson.message || "Gagal mengunggah gambar.");
+      const imageUrl = uploadJson.data.url;
+
+      // 2. Analisis via ML
+      setPhase("analyzing");
+      const analyzeRes = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl }),
+      });
+      const analyzeJson = await analyzeRes.json();
+
+      if (!analyzeRes.ok)
+        throw new Error(analyzeJson.message || "Analisis gagal.");
+
+      const mlData = analyzeJson.data as MLAnalysisResult;
+
+      // 3. Gabungkan hasil ML dengan rekomendasi lokal
+      const finalResult: AnalysisResult = {
+        ...mlData,
+        recommendations: mlData.urgency ? RECOMMENDATIONS[mlData.urgency] : [],
+      };
+
+      setPhase("done");
+      setResult(finalResult);
+      setAnalysis(finalResult, preview, file.name);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Gagal mengirim laporan.";
+
+      setErrorMsg(message || "Terjadi kesalahan sistem.");
       setPhase("error");
     }
   }, [file, preview, setAnalysis]);
 
-  // ── Reset ────────────────────────────────────────────────────────────────────
   const reset = useCallback(() => {
     setFile(null);
     setPreview(null);
