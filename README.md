@@ -94,6 +94,154 @@ Platform memiliki halaman publik lengkap untuk membangun kepercayaan dan mendoro
 
 ---
 
+## Keputusan Arsitektur Penting
+
+### Mobile-First Layout Dua Mode
+
+Dashboard menggunakan layout responsif yang berbeda secara fundamental antara mobile dan desktop — bukan sekadar hide/show elemen. Desktop mendapat **Shadcn Sidebar** collapsible dengan navigasi teks + breadcrumb di header. Mobile mendapat **bottom navigation floating pill** dengan icon-only + CTA "Buat Laporan" yang elevated di tengah, dan **MobileHeader** compact dengan judul halaman dinamis berdasarkan route aktif.
+
+### State Sharing Playground → Report tanpa Re-analyze
+
+Hasil analisis AI disimpan di Zustand store yang dipersist ke `sessionStorage`. Ketika user navigasi dari `/dashboard/playground` ke `/dashboard/report/new`, form laporan membaca store dan mengisi field secara otomatis — judul, kategori, dan rekomendasi sudah terisi. Setelah submit, `store.clear()` dipanggil untuk mencegah data lama mengisi form berikutnya.
+
+### Zero-Latency Zoom Map
+
+Filter wilayah di peta tidak bergantung pada API eksternal untuk menentukan posisi kamera. Koordinat centroid 38 provinsi dan ~100 kabupaten/kota dibundle langsung di `data/wilayah-coords.ts` sebagai TypeScript module. Saat user memilih wilayah, `flyTo()` dipanggil secara instan — tidak ada loading state, tidak ada CORS, tidak ada network request.
+
+### Proxy API untuk CORS ibnux
+
+ibnux.github.io memiliki proteksi CORS yang mencegah fetch langsung dari browser. Solusinya adalah Next.js API Route Handler di `/api/wilayah/[...path]/route.ts` yang bertindak sebagai proxy server-side — browser hanya fetch ke domain yang sama, server Next.js yang forward ke ibnux (server-to-server bebas CORS). Response di-cache selama 24 jam di edge.
+
+### Strict Mode Safe Leaflet
+
+React Strict Mode me-mount komponen dua kali di development, menyebabkan Leaflet crash dengan error "Map container is already initialized." Fix diterapkan dengan tiga lapis perlindungan: flag `isMounted` untuk membatalkan async import yang in-flight, penghapusan `_leaflet_id` dari DOM container sebelum init, dan reset `LRef.current` di cleanup function.
+
+---
+
+## Memulai
+
+### Prasyarat
+
+- Node.js 20+
+- npm / pnpm / yarn
+- Git
+
+### Instalasi
+
+```bash
+# Clone repository
+git clone https://github.com/your-org/streetwatch.git
+cd streetwatch
+
+# Install dependencies
+npm install
+
+# Copy environment variables
+cp .env.example .env.local
+```
+
+### Environment Variables
+
+```bash
+# .env.local
+
+# Wajib untuk production (opsional untuk development dengan mock data)
+ANTHROPIC_API_KEY=sk-ant-...       # Untuk Claude Vision API (fitur AI production)
+
+# Opsional
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+> Development menggunakan mock data — semua fitur berjalan tanpa API key eksternal.
+
+### Menjalankan Development Server
+
+```bash
+npm run dev
+# Buka http://localhost:3000
+```
+
+### Build Production
+
+```bash
+npm run build
+npm run start
+```
+
+---
+
+## Instalasi Dependensi Tambahan
+
+Beberapa paket perlu diinstall secara manual:
+
+```bash
+# Peta
+npm install leaflet
+npm install -D @types/leaflet
+
+# State management
+npm install zustand
+
+# Date formatting
+npm install date-fns
+
+# Icons
+npm install lucide-react @remixicon/react
+
+# shadcn/ui components (jalankan satu per satu sesuai kebutuhan)
+npx shadcn@latest add sidebar
+npx shadcn@latest add accordion
+npx shadcn@latest add tabs
+npx shadcn@latest add select
+npx shadcn@latest add label
+npx shadcn@latest add textarea
+npx shadcn@latest add avatar
+npx shadcn@latest add badge
+npx shadcn@latest add button
+npx shadcn@latest add input
+npx shadcn@latest add separator
+npx shadcn@latest add breadcrumb
+```
+
+---
+
+## Halaman & Route
+
+| Route                    | Deskripsi                              | Akses    |
+| ------------------------ | -------------------------------------- | -------- |
+| `/`                      | Landing page                           | Publik   |
+| `/about`                 | Tentang tim dan misi                   | Publik   |
+| `/partnership`           | Program kemitraan pemerintah           | Publik   |
+| `/contact`               | Hubungi Kami                           | Publik   |
+| `/dashboard`             | Overview + Redirect → `/dashboard/map` | Auth     |
+| `/dashboard/map`         | Peta sebaran laporan                   | Auth     |
+| `/dashboard/playground`  | StreetWatch AI Analyzer                | Auth     |
+| `/dashboard/reports`     | Daftar Laporan                         | Auth     |
+| `/dashboard/reports/new` | Buat laporan baru                      | Auth     |
+| `/dashboard/profile`     | Profil, badge, riwayat                 | Auth     |
+| `/api/wilayah/[...path]` | Proxy ibnux wilayah API                | Internal |
+
+---
+
+## Design System
+
+StreetWatch menggunakan sistem desain berbasis **OKLCH color space** untuk warna yang konsisten di berbagai tampilan. Token warna didefinisikan di `globals.css` menggunakan CSS custom properties, sehingga dark mode berfungsi tanpa JavaScript tambahan.
+
+```css
+/* Primary — Teal */
+--primary: oklch(0.511 0.096 186.391); /* Light mode */
+--primary: oklch(0.437 0.078 188.216); /* Dark mode */
+
+/* Radius system */
+--radius: 0.875rem; /* Base — semua varian dihitung dari sini */
+```
+
+Font heading menggunakan **Playfair Display** (serif) untuk nuansa editorial yang trustworthy sesuai karakter civic-tech. Body text menggunakan **Geist Sans**, monospace menggunakan **Geist Mono**.
+
+Urgensi laporan dikodekan dengan warna konsisten di seluruh UI: merah (kritis), oranye (tinggi), kuning (sedang), hijau (rendah).
+
+---
+
 ## Arsitektur Proyek
 
 ```
@@ -277,154 +425,6 @@ streetwatch-fe
 └─ tsconfig.json
 
 ```
-
----
-
-## Keputusan Arsitektur Penting
-
-### Mobile-First Layout Dua Mode
-
-Dashboard menggunakan layout responsif yang berbeda secara fundamental antara mobile dan desktop — bukan sekadar hide/show elemen. Desktop mendapat **Shadcn Sidebar** collapsible dengan navigasi teks + breadcrumb di header. Mobile mendapat **bottom navigation floating pill** dengan icon-only + CTA "Buat Laporan" yang elevated di tengah, dan **MobileHeader** compact dengan judul halaman dinamis berdasarkan route aktif.
-
-### State Sharing Playground → Report tanpa Re-analyze
-
-Hasil analisis AI disimpan di Zustand store yang dipersist ke `sessionStorage`. Ketika user navigasi dari `/dashboard/playground` ke `/dashboard/report/new`, form laporan membaca store dan mengisi field secara otomatis — judul, kategori, dan rekomendasi sudah terisi. Setelah submit, `store.clear()` dipanggil untuk mencegah data lama mengisi form berikutnya.
-
-### Zero-Latency Zoom Map
-
-Filter wilayah di peta tidak bergantung pada API eksternal untuk menentukan posisi kamera. Koordinat centroid 38 provinsi dan ~100 kabupaten/kota dibundle langsung di `data/wilayah-coords.ts` sebagai TypeScript module. Saat user memilih wilayah, `flyTo()` dipanggil secara instan — tidak ada loading state, tidak ada CORS, tidak ada network request.
-
-### Proxy API untuk CORS ibnux
-
-ibnux.github.io memiliki proteksi CORS yang mencegah fetch langsung dari browser. Solusinya adalah Next.js API Route Handler di `/api/wilayah/[...path]/route.ts` yang bertindak sebagai proxy server-side — browser hanya fetch ke domain yang sama, server Next.js yang forward ke ibnux (server-to-server bebas CORS). Response di-cache selama 24 jam di edge.
-
-### Strict Mode Safe Leaflet
-
-React Strict Mode me-mount komponen dua kali di development, menyebabkan Leaflet crash dengan error "Map container is already initialized." Fix diterapkan dengan tiga lapis perlindungan: flag `isMounted` untuk membatalkan async import yang in-flight, penghapusan `_leaflet_id` dari DOM container sebelum init, dan reset `LRef.current` di cleanup function.
-
----
-
-## Memulai
-
-### Prasyarat
-
-- Node.js 20+
-- npm / pnpm / yarn
-- Git
-
-### Instalasi
-
-```bash
-# Clone repository
-git clone https://github.com/your-org/streetwatch.git
-cd streetwatch
-
-# Install dependencies
-npm install
-
-# Copy environment variables
-cp .env.example .env.local
-```
-
-### Environment Variables
-
-```bash
-# .env.local
-
-# Wajib untuk production (opsional untuk development dengan mock data)
-ANTHROPIC_API_KEY=sk-ant-...       # Untuk Claude Vision API (fitur AI production)
-
-# Opsional
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-> Development menggunakan mock data — semua fitur berjalan tanpa API key eksternal.
-
-### Menjalankan Development Server
-
-```bash
-npm run dev
-# Buka http://localhost:3000
-```
-
-### Build Production
-
-```bash
-npm run build
-npm run start
-```
-
----
-
-## Instalasi Dependensi Tambahan
-
-Beberapa paket perlu diinstall secara manual:
-
-```bash
-# Peta
-npm install leaflet
-npm install -D @types/leaflet
-
-# State management
-npm install zustand
-
-# Date formatting
-npm install date-fns
-
-# Icons
-npm install lucide-react @remixicon/react
-
-# shadcn/ui components (jalankan satu per satu sesuai kebutuhan)
-npx shadcn@latest add sidebar
-npx shadcn@latest add accordion
-npx shadcn@latest add tabs
-npx shadcn@latest add select
-npx shadcn@latest add label
-npx shadcn@latest add textarea
-npx shadcn@latest add avatar
-npx shadcn@latest add badge
-npx shadcn@latest add button
-npx shadcn@latest add input
-npx shadcn@latest add separator
-npx shadcn@latest add breadcrumb
-```
-
----
-
-## Halaman & Route
-
-| Route                    | Deskripsi                              | Akses    |
-| ------------------------ | -------------------------------------- | -------- |
-| `/`                      | Landing page                           | Publik   |
-| `/about`                 | Tentang tim dan misi                   | Publik   |
-| `/partnership`           | Program kemitraan pemerintah           | Publik   |
-| `/contact`               | Hubungi Kami                           | Publik   |
-| `/dashboard`             | Overview + Redirect → `/dashboard/map` | Auth     |
-| `/dashboard/map`         | Peta sebaran laporan                   | Auth     |
-| `/dashboard/playground`  | StreetWatch AI Analyzer                | Auth     |
-| `/dashboard/reports`     | Daftar Laporan                         | Auth     |
-| `/dashboard/reports/new` | Buat laporan baru                      | Auth     |
-| `/dashboard/profile`     | Profil, badge, riwayat                 | Auth     |
-| `/api/wilayah/[...path]` | Proxy ibnux wilayah API                | Internal |
-
----
-
-## Design System
-
-StreetWatch menggunakan sistem desain berbasis **OKLCH color space** untuk warna yang konsisten di berbagai tampilan. Token warna didefinisikan di `globals.css` menggunakan CSS custom properties, sehingga dark mode berfungsi tanpa JavaScript tambahan.
-
-```css
-/* Primary — Teal */
---primary: oklch(0.511 0.096 186.391); /* Light mode */
---primary: oklch(0.437 0.078 188.216); /* Dark mode */
-
-/* Radius system */
---radius: 0.875rem; /* Base — semua varian dihitung dari sini */
-```
-
-Font heading menggunakan **Playfair Display** (serif) untuk nuansa editorial yang trustworthy sesuai karakter civic-tech. Body text menggunakan **Geist Sans**, monospace menggunakan **Geist Mono**.
-
-Urgensi laporan dikodekan dengan warna konsisten di seluruh UI: merah (kritis), oranye (tinggi), kuning (sedang), hijau (rendah).
 
 ---
 
