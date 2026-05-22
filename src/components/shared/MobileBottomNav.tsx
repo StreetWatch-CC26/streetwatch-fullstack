@@ -12,9 +12,11 @@ import {
   // RiFlaskFill,
   RiMenuFill,
   RiGlobalFill,
+  RiHome6Fill,
+  RiAccountCircleFill,
 } from "@remixicon/react";
 
-import { User, FileText, LogOut, ChevronRight } from "lucide-react";
+import { LogOut, ChevronRight } from "lucide-react";
 
 import {
   Drawer,
@@ -27,7 +29,7 @@ import {
 
 // Navigasi Utama (Bottom Bar)
 const mainNavItems = [
-  { title: "Overview", url: "/dashboard/overview", icon: RiPieChart2Fill },
+  { title: "Beranda", url: "/dashboard/report", icon: RiHome6Fill },
   { title: "Peta", url: "/dashboard/map", icon: RiCompassDiscoverFill },
   {
     title: "Lapor",
@@ -35,7 +37,7 @@ const mainNavItems = [
     icon: RiAddCircleFill,
     cta: true,
   },
-  { title: "Profil", url: "/dashboard/profile", icon: User },
+  { title: "Profil", url: "/dashboard/profile", icon: RiAccountCircleFill },
   // { title: "AI", url: "/dashboard/playground", icon: RiFlaskFill },
 ];
 
@@ -50,7 +52,7 @@ const menuGroups = [
   {
     title: "Aktivitas",
     items: [
-      { label: "Laporan Saya", icon: FileText, url: "/dashboard/reports" },
+      { label: "Overview", icon: RiPieChart2Fill, url: "/dashboard/overview" },
     ],
   },
 ];
