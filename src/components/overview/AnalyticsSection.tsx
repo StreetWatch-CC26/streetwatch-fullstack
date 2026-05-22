@@ -25,6 +25,7 @@ export function AnalyticsSection() {
     verifiedReports: 0,
     failReports: 0,
     verificationRate: 0,
+    averageConfidence: 0,
   });
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlyTrend[]>([]);
   const [categoryBreakdown, setCategoryBreakdown] = useState<
@@ -126,8 +127,9 @@ export function AnalyticsSection() {
           />
           <StatCard
             icon={Target}
-            label="Tingkat Akurasi AI"
-            value={`${overview.verificationRate}%`}
+            label="Rata-rata Keyakinan AI"
+            value={`${overview.averageConfidence}%`}
+            sub="Dari seluruh laporan"
           />
         </div>
       </div>
