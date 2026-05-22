@@ -33,3 +33,13 @@ export const conflict = (message: string) =>
 
 export const serverError = (message = "Terjadi kesalahan server") =>
   NextResponse.json({ success: false, message }, { status: 500 });
+
+/** 422 Unprocessable Entity — input valid secara sintaks tapi ditolak domain (misal: bukan foto jalan) */
+export const unprocessableEntity = (message: string) => {
+  return NextResponse.json({ success: false, message }, { status: 422 });
+};
+
+/** 503 Service Unavailable — ML service down, timeout, atau error eksternal */
+export const serviceUnavailable = (message: string) => {
+  return NextResponse.json({ success: false, message }, { status: 503 });
+};
