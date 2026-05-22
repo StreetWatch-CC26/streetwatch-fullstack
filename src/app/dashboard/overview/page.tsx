@@ -1,7 +1,7 @@
 "use client";
 
 import { AnalyticsSection } from "@/components/overview/AnalyticsSection";
-import { ReportListSection } from "@/components/overview/ReportListSection";
+// import { ReportListSection } from "@/components/overview/ReportListSection";
 
 export default function DashboardPage() {
   return (
@@ -17,7 +17,7 @@ export default function DashboardPage() {
 
       <AnalyticsSection />
 
-      <ReportListSection />
+      {/* <ReportListSection /> */}
     </div>
   );
 }
