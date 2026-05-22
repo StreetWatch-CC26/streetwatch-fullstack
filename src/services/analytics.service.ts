@@ -6,15 +6,18 @@ export const analyticsService = {
    * Menghitung total, jumlah verified, jumlah fail, dan rasio verifikasi.
    */
   async getOverview() {
-    const [total, byStatus] = await Promise.all([
+    const [total, byStatus, avgScoreResult] = await Promise.all([
       prisma.report.count(),
       prisma.report.groupBy({
         by: ["status"],
         _count: { _all: true },
       }),
+      prisma.report.aggregate({
+        _avg: { aiScore: true },
+        where: { aiScore: { not: null } },
+      }),
     ]);
 
-    // Memetakan hasil groupBy ke dalam objek key-value
     const counts = Object.fromEntries(
       byStatus.map((r) => [r.status, r._count._all]),
     );
@@ -22,12 +25,17 @@ export const analyticsService = {
     const verified = counts.verified ?? 0;
     const fail = counts.fail ?? 0;
 
+    // Ambil rata-rata, bulatkan. Jika kosong, kembalikan 0
+    const avgConfidence = avgScoreResult._avg.aiScore
+      ? Math.round(avgScoreResult._avg.aiScore)
+      : 0;
+
     return {
       totalReports: total,
       verifiedReports: verified,
       failReports: fail,
-      // Rasio verifikasi: berapa persen laporan yang berhasil dikenali AI
       verificationRate: total > 0 ? Math.round((verified / total) * 100) : 0,
+      averageConfidence: avgConfidence,
     };
   },
 
