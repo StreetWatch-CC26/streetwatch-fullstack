@@ -272,7 +272,7 @@ export function getPageMeta(pathname: string) {
           ...meta,
           // Gabungkan teks statis dengan ID yang didapat
           // title: `Detail Laporan ${id.substring(0, 6)}`, // Dipotong agar tidak terlalu panjang di mobile
-          title: `Detail Laporan ${id}`,
+          title: `Detail Laporan dengan ID: [${id}]`,
         };
       }
     }
