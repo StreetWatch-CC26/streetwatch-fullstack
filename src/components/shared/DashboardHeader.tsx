@@ -1,6 +1,5 @@
 "use client";
 
-import { AddReportBtn } from "@/components/shared/AddReportBtn";
 import { usePathname } from "next/navigation";
 
 import {
@@ -36,14 +35,8 @@ export function LeftDashboardHeader() {
 }
 
 export function RightDashboardHeader() {
-  const pathname = usePathname();
-  const showAddReportBtn =
-    pathname === "/dashboard/reports" || pathname === "/dashboard/map";
-
   return (
     <div className="flex items-center gap-3 pe-4">
-      {showAddReportBtn && <AddReportBtn />}
-
       <ThemeToggle />
     </div>
   );
