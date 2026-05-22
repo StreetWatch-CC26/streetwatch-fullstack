@@ -97,7 +97,7 @@ function Dropdown({
         </span>
 
         {/* Right icons */}
-        <span className="flex items-center gap-0.5 flex-shrink-0">
+        <span className="flex items-center gap-0.5 shrink-0">
           {loading && <Loader2 className="w-3 h-3 text-primary animate-spin" />}
           {value && !loading && (
             <span
@@ -133,11 +133,11 @@ function Dropdown({
 
       {/* Dropdown panel */}
       {open && !isDisabled && (
-        <div className="absolute top-full left-0 mt-1 z-[500] w-full min-w-[220px] bg-popover border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-100">
+        <div className="absolute top-full left-0 mt-1 z-500 w-full min-w-55 bg-popover border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-100">
           {/* Search */}
           <div className="p-2 border-b border-border">
             <label className="flex items-center gap-1.5 px-2 py-1 bg-muted rounded-lg">
-              <Search className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+              <Search className="w-3 h-3 text-muted-foreground shrink-0" />
               <input
                 autoFocus
                 value={query}
@@ -181,7 +181,7 @@ function Dropdown({
                 >
                   <span className="truncate">{item.nama}</span>
                   {value?.id === item.id && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                   )}
                 </button>
               ))
@@ -226,7 +226,7 @@ export function WilayahFilterBar({ filter }: Props) {
   return (
     <div className="flex items-center gap-1.5 w-full min-w-0">
       {/* Icon */}
-      <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
 
       {/* Provinsi */}
       <Dropdown
@@ -255,7 +255,7 @@ export function WilayahFilterBar({ filter }: Props) {
           onClick={reset}
           title="Reset filter"
           className={cn(
-            "h-8 flex items-center gap-1 px-2 rounded-lg text-xs flex-shrink-0 transition-colors",
+            "h-8 flex items-center gap-1 px-2 rounded-lg text-xs shrink-0 transition-colors",
             "text-muted-foreground border border-transparent",
             "hover:text-destructive hover:bg-destructive/8 hover:border-destructive/20",
           )}
