@@ -9,6 +9,7 @@ export interface AnalyticsOverview {
   verifiedReports: number;
   failReports: number;
   verificationRate: number;
+  averageConfidence: number;
 }
 
 export interface MonthlyTrend {
