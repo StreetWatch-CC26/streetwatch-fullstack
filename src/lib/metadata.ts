@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 export const siteConfig = {
   name: "StreetWatch",
-  url: "https://streetwatch.vercel.app",
+  url: "https://streetwatchid.vercel.app",
   description:
-    "Platform monitoring jalan rusak berbasis AI untuk membantu percepatan perbaikan infrastruktur.",
+    "Platform monitoring jalan rusak yang menghubungkan warga, pemerintah, dan teknologi AI untuk  mempercepat penanganan kerusakan jalan di seluruh Indonesia.",
 };
 
 export const metadata: Metadata = {

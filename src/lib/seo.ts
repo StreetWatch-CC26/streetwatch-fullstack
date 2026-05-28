@@ -4,7 +4,7 @@ export const jsonLd = {
   name: "StreetWatch",
   description:
     "AI-Powered pothole monitoring platform for smarter city infrastructure.",
-  url: "https://streetwatch.vercel.app",
+  url: "https://streetwatchid.vercel.app",
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Web",
   creator: {
