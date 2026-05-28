@@ -7,10 +7,9 @@
  * + Indicator bar fasa di bawah gambar.
  */
 
+import Image from "next/image";
 import { PHASE_LABEL, type AnalysisPhase } from "@/data/analysisSchema";
 import { cn } from "@/lib/utils";
-
-const PHASES: AnalysisPhase[] = ["reading", "scanning", "classifying", "done"];
 
 interface Props {
   phase: AnalysisPhase;
@@ -19,14 +18,15 @@ interface Props {
 
 export function ScannerOverlay({ phase, preview }: Props) {
   const isActive = phase !== "idle" && phase !== "done" && phase !== "error";
-  const currentIdx = PHASES.indexOf(phase);
 
   return (
     <div className="w-full rounded-2xl overflow-hidden border border-border relative">
-      {/* Image */}
-      <img
+      <Image
         src={preview}
         alt="Gambar dianalisis"
+        width={800}
+        height={600}
+        unoptimized
         className={cn(
           "w-full max-h-72 object-cover transition-all duration-500",
           isActive && "brightness-75",
@@ -38,7 +38,7 @@ export function ScannerOverlay({ phase, preview }: Props) {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Scan line */}
           <div
-            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-90"
+            className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-primary to-transparent opacity-90"
             style={{ animation: "scanLine 1.6s ease-in-out infinite" }}
           />
           {/* Corner brackets */}
@@ -63,7 +63,7 @@ export function ScannerOverlay({ phase, preview }: Props) {
             }}
           />
           {/* Phase label */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border text-xs font-medium text-primary font-mono">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm border border-border text-xs font-medium text-primary font-mono whitespace-nowrap">
             {PHASE_LABEL[phase]}
           </div>
         </div>
@@ -86,8 +86,8 @@ export function ScannerOverlay({ phase, preview }: Props) {
 export function PhaseStepBar({ phase }: { phase: AnalysisPhase }) {
   const steps = [
     { key: "reading", label: "Baca" },
-    { key: "scanning", label: "Pindai" },
-    { key: "classifying", label: "Klasifikasi" },
+    { key: "uploading", label: "Unggah" },
+    { key: "analyzing", label: "Analisis" },
     { key: "done", label: "Selesai" },
   ] as const;
 
