@@ -36,14 +36,14 @@ const faqs = [
 
 export function FAQSection() {
   return (
-    <section id="faq" className="py-24 lg:py-32">
+    <section id="faq" className="py-16 md:py-24 lg:py-32 px-5 md:px-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">
             FAQ
           </p>
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+          <h2 className="font-heading text-2xl sm:text-4xl font-bold text-foreground tracking-tight">
             Pertanyaan yang sering ditanyakan
           </h2>
         </div>
@@ -56,10 +56,10 @@ export function FAQSection() {
               value={`item-${i}`}
               className="border border-border rounded-xl px-5 bg-card data-[state=open]:border-primary/40 transition-colors"
             >
-              <AccordionTrigger className="text-left font-medium text-foreground hover:no-underline py-5">
+              <AccordionTrigger className="text-left text-xs md:text-base font-medium text-foreground hover:no-underline py-5">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-5">
+              <AccordionContent className="text-xs md:text-base text-muted-foreground leading-relaxed pb-5">
                 {faq.a}
               </AccordionContent>
             </AccordionItem>

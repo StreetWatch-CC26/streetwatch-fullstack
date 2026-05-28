@@ -3,22 +3,22 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const testimonials = [
   {
-    name: "Budi Santoso",
+    name: "Ali Musthafa Kamal",
     role: "Warga Pekanbaru",
     initials: "BS",
     quote:
       "Saya laporkan lubang di jalan depan rumah, 3 hari kemudian ada petugas yang datang. Sebelumnya sudah setahun nunggu!",
   },
   {
-    name: "Ir. Dewi Rahayu",
-    role: "Kepala Dinas PU Kota Medan",
+    name: "Ir. Agung Nugroho",
+    role: "Walikota Pekanbaru",
     initials: "DR",
     quote:
       "StreetWatch membantu kami memprioritaskan perbaikan dengan data yang akurat. Efisiensi anggaran meningkat signifikan.",
   },
   {
-    name: "Andi Pratama",
-    role: "Koordinator Komunitas Surabaya",
+    name: "Firza Hakim",
+    role: "Koordinator Komunitas Medan",
     initials: "AP",
     quote:
       "Platform ini benar-benar menjembatani warga dan pemerintah. Transparansi prosesnya luar biasa.",
@@ -34,14 +34,17 @@ const impactNumbers = [
 
 export function ImpactSection() {
   return (
-    <section id="impact" className="py-24 lg:py-32 bg-muted/30">
+    <section
+      id="impact"
+      className="py-16 md:py-24 lg:py-32 px-5 md:px-20 bg-muted/30"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">
             Dampak Nyata
           </p>
-          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
+          <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
             Ribuan jalan lebih aman,
             <br className="hidden sm:block" />
             berkat komunitas
@@ -49,7 +52,7 @@ export function ImpactSection() {
         </div>
 
         {/* Impact numbers */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10 md:mb-20">
           {impactNumbers.map((item) => (
             <div
               key={item.label}

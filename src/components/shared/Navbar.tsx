@@ -39,19 +39,23 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="left" className="w-65" aria-describedby={undefined}>
+      <SheetContent
+        side="left"
+        className="w-50 px-5"
+        aria-describedby={undefined}
+      >
         <SheetTitle aria-describedby={undefined} className="hidden">
           Menu
         </SheetTitle>
         <div className="flex flex-col h-full my-5 mx-3">
           {/* LOGO */}
-          <div className="items-center mb-6">
+          <div className="items-center pb-3 mb-6 border-b border-border">
             <Image
               src="/logo-light.png"
               alt="Logo"
               width={120}
               height={40}
-              className="block dark:hidden"
+              className="block dark:hidden w-24 h-auto"
             />
             {/* Dark mode */}
             <Image
@@ -59,7 +63,7 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
               alt="Logo"
               width={120}
               height={40}
-              className="hidden dark:block"
+              className="hidden dark:block w-24 h-auto"
             />
           </div>
 
@@ -118,19 +122,18 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
 export default function Navbar({ isLoggedIn, pathname }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-16 items-center justify-between px-5 md:px-20">
         {/* LEFT */}
-        <div className="flex items-center gap-4 ms-3 md:ms-20">
-          {/* PANGGIL MOBILE MENU DI SINI */}
+        <div className="flex items-center gap-2 md:gap-4">
           <MobileNavbar pathname={pathname} isLoggedIn={isLoggedIn} />
 
-          <Link href="/" className="items-center">
+          <Link href="/" className="items-center flex">
             <Image
               src="/logo-light.png"
               alt="Logo"
               width={120}
               height={40}
-              className="block dark:hidden"
+              className="block dark:hidden w-24 md:w-26 lg:w-30 h-auto transition-all"
             />
             {/* Dark mode */}
             <Image
@@ -138,40 +141,39 @@ export default function Navbar({ isLoggedIn, pathname }: NavbarProps) {
               alt="Logo"
               width={120}
               height={40}
-              className="hidden dark:block"
+              className="hidden dark:block w-24 md:w-30 h-auto transition-all"
             />
           </Link>
-
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-10 text-sm md:ms-10 lg:ms-20">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "relative transition-colors duration-200",
-                    isActive
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground hover:text-foreground",
-                    "after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all",
-                    "hover:after:w-full",
-                    isActive && "after:w-full",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
         </div>
 
+        {/* DESKTOP NAV */}
+        <nav className="hidden md:flex items-center md:gap-3 lg:gap-10 md:text-xs lg:text-sm">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative transition-colors duration-200",
+                  isActive
+                    ? "text-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground",
+                  "after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all",
+                  "hover:after:w-full",
+                  isActive && "after:w-full",
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
         {/* RIGHT */}
-        <div className="flex items-center gap-3 md:me-10 lg:me-20">
+        <div className="flex items-center gap-3">
           <ThemeToggle className="hidden md:flex" />
-          {/* TOMBOL MASUK / DASHBOARD (DESKTOP) */}
           {isLoggedIn ? (
             <Link href="/dashboard">
               <Button size="sm" className="p-3 cursor-pointer">

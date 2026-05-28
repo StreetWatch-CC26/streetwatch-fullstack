@@ -11,7 +11,7 @@ const stats = [
 
 export function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16 pb-6 ">
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-8 lg:pt-16 pb-16 md:pb-24 lg:pb-32 px-5 md:px-20">
       {/* Background grid texture */}
       <div
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
@@ -38,27 +38,27 @@ export function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
             </span>
-            AI-Powered Pothole Monitoring
+            AI-Powered Pothole Monitoring System
           </Badge>
         </div>
 
         {/* Headline */}
-        <h1 className="font-heading text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05] mb-6">
+        <h1 className="font-heading text-3xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05] mb-6">
           Laporkan Jalan Rusak.
           <br />
           <span className="text-primary">Diperbaiki Lebih Cepat.</span>
         </h1>
 
         {/* Subheadline */}
-        <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
           StreetWatch menggunakan kecerdasan buatan untuk mendeteksi, memetakan,
           dan melacak kerusakan jalan dengan menghubungkan warga dengan
           pemerintah untuk respons yang lebih cepat.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <Button size="lg" className="gap-2 text-base px-8" asChild>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10 md:mb-16">
+          <Button size="lg" className="gap-2 text-sm md:text-base px-8" asChild>
             {isLoggedIn ? (
               <Link href="/dashboard/reports">
                 Lihat Dashboard
@@ -74,7 +74,7 @@ export function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
           <Button
             size="lg"
             variant="outline"
-            className="gap-2 text-base px-8"
+            className="gap-2 text-sm md:text-base px-8"
             asChild
           >
             <Link href="#how-it-works">Lihat Demo</Link>
@@ -85,7 +85,7 @@ export function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className="grid grid-cols-3 gap-6 max-w-lg mx-auto">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <div className="font-heading text-2xl sm:text-3xl font-bold text-foreground">
+              <div className="font-heading text-xl sm:text-3xl font-bold text-foreground">
                 {stat.value}
               </div>
               <div className="text-xs sm:text-sm text-muted-foreground mt-1">

@@ -9,13 +9,13 @@ import { cookies } from "next/headers";
 
 export default async function LandingPage() {
   const cookieStore = await cookies();
-    const token = cookieStore.get("authjs.session-token")?.value;
-  
-    const isLoggedIn = !!token;
+  const token = cookieStore.get("authjs.session-token")?.value;
+
+  const isLoggedIn = !!token;
   return (
     <main className="flex flex-col items-center justify-center">
       <div className=" min-h-dvh w-full">
-        <HeroSection isLoggedIn={isLoggedIn}/>
+        <HeroSection isLoggedIn={isLoggedIn} />
         <FeaturesSection />
         <HowItWorksSection />
         <ImpactSection />

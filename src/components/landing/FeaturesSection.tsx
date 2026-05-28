@@ -35,26 +35,29 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-24 lg:py-32 bg-muted/30">
+    <section
+      id="features"
+      className="py-16 md:py-24 lg:py-32 px-5 md:px-20 bg-muted/30"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">
             Fitur Platform
           </p>
-          <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
+          <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
             Semua yang dibutuhkan untuk
             <br className="block" />
             infrastruktur yang lebih baik
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-4 text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             StreetWatch mengintegrasikan AI, pemetaan, dan manajemen laporan
             dalam satu platform yang mudah digunakan.
           </p>
         </div>
 
         {/* Feature grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
           {features.map((feature, i) => (
             <div
               key={feature.title}
