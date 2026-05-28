@@ -1,11 +1,4 @@
-import {
-  BrainCircuit,
-  Map,
-  Bell,
-  BarChart3,
-  Users,
-  FileCheck,
-} from "lucide-react";
+import { BrainCircuit, Map, BarChart3, Users, FileCheck } from "lucide-react";
 
 const features = [
   {
@@ -20,12 +13,6 @@ const features = [
     description:
       "Visualisasi interaktif seluruh laporan aktif di wilayahmu. Filter berdasarkan status, keparahan, atau waktu laporan.",
   },
-  // {
-  //   icon: Bell,
-  //   title: "Notifikasi Progress",
-  //   description:
-  //     "Pelapor mendapat update otomatis saat laporan mereka diverifikasi, dijadwalkan perbaikan, atau sudah diselesaikan.",
-  // },
   {
     icon: BarChart3,
     title: "Dashboard Analitik",
