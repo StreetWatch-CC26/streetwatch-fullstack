@@ -26,6 +26,10 @@ export const reportService = {
     return report;
   },
 
+  async getForExport(filters: ReportFilters, userId?: string) {
+    return reportRepository.findForExport(filters, userId);
+  },
+
   async create(
     authorId: string,
     data: CreateReportInput,
