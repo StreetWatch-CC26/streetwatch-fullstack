@@ -21,10 +21,24 @@ export interface ReportItem {
   upvoteCount: number;
   author?: ReportAuthor;
   upvotes?: { id: string }[];
+  priorityScore: number;
 }
 
 export interface ReportDetail extends ReportItem {
   aiScore?: number;
   aiLevel?: string;
   aiSummary?: string;
+}
+
+export interface ExportFilters {
+  dateFrom: string;
+  dateTo: string;
+  provinsi: string;
+  kota: string;
+  urgency: string;
+}
+
+export interface ExportDialogProps {
+  open: boolean;
+  onClose: () => void;
 }
