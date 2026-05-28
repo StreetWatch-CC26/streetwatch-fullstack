@@ -14,6 +14,7 @@ import { jsonLd } from "@/lib/seo";
 
 import { Geist, Geist_Mono, Inter, Roboto_Slab } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 
 // FONT SETUP
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -67,21 +68,23 @@ export default function RootLayout({
       </head>
 
       <body className="flex flex-col min-h-dvh" suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SessionProviderClient>
-            <Toaster position="top-center" />
-            <ToastListener />
+        <Suspense fallback={<></>}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SessionProviderClient>
+              <Toaster position="top-center" />
+              <ToastListener />
 
-            <main>
-              <TooltipProvider>{children}</TooltipProvider>
-            </main>
-          </SessionProviderClient>
-        </ThemeProvider>
+              <main>
+                <TooltipProvider>{children}</TooltipProvider>
+              </main>
+            </SessionProviderClient>
+          </ThemeProvider>
+        </Suspense>
       </body>
     </html>
   );
