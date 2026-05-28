@@ -10,7 +10,7 @@
 [![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=flat-square&logo=vercel)](https://streetwatch.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
 
-[Demo Live](https://streetwatch.vercel.app) · [Laporkan Bug](https://github.com/your-org/streetwatch/issues) · [Diskusi](https://github.com/orgs/StreetWatch-CC26/discussions)
+[Demo Live](https://streetwatchid.vercel.app) · [Laporkan Bug](https://github.com/StreetWatch-CC26/streetwatch-fullstack/issues) · [Diskusi](https://github.com/orgs/StreetWatch-CC26/discussions)
 
 </div>
 
@@ -18,7 +18,7 @@
 
 ## Tentang Proyek
 
-StreetWatch adalah platform civic-tech yang menghubungkan **warga, pemerintah daerah, dan teknologi AI** untuk mempercepat penanganan kerusakan jalan di seluruh Indonesia. Warga melaporkan kerusakan melalui foto, AI menganalisis tingkat keparahan secara otomatis, dan laporan langsung masuk ke dashboard Dinas PU terkait.
+StreetWatch adalah platform civic-tech yang menghubungkan **warga, pemerintah daerah, dan teknologi AI** untuk mempercepat penanganan kerusakan jalan di seluruh Indonesia. Warga melaporkan kerusakan melalui foto, AI menganalisis tingkat keparahan secara otomatis, dan laporan langsung masuk ke halaman dashboard.
 
 Proyek ini merupakan **Capstone Project 2026** yang dikembangkan sebagai solusi atas permasalahan nyata infrastruktur jalan di Indonesia — di mana rata-rata waktu respons perbaikan nasional masih berada di angka 45+ hari.
 
