@@ -26,8 +26,8 @@ const testimonials = [
 ];
 
 const impactNumbers = [
-  { value: "2.400+", label: "Laporan Diterima" },
-  { value: "1.800+", label: "Jalan Diperbaiki" },
+  { value: "1000+", label: "Laporan Diterima" },
+  { value: "950+", label: "Jalan Diperbaiki" },
   { value: "18", label: "Kota Aktif" },
   { value: "4.2 Hari", label: "Rata-rata Respons" },
 ];
