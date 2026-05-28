@@ -14,6 +14,8 @@ export interface ReportFilters {
   status?: ReportStatus;
   category?: DamageCategory;
   search?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
 export interface PaginationOptions {
@@ -41,30 +43,46 @@ function buildOrderBy(
   }
 }
 
+function buildWhere(filters: ReportFilters): Prisma.ReportWhereInput {
+  // Untuk dateTo: set ke akhir hari agar inklusif
+  let dateToEnd: Date | undefined;
+  if (filters.dateTo) {
+    dateToEnd = new Date(filters.dateTo);
+    dateToEnd.setHours(23, 59, 59, 999);
+  }
+
+  return {
+    ...(filters.provinsi && {
+      provinsi: { contains: filters.provinsi, mode: "insensitive" },
+    }),
+    ...(filters.kota && {
+      kota: { contains: filters.kota, mode: "insensitive" },
+    }),
+    ...(filters.kecamatan && {
+      kecamatan: { contains: filters.kecamatan, mode: "insensitive" },
+    }),
+    ...(filters.urgency && { urgency: filters.urgency }),
+    ...(filters.status && { status: filters.status }),
+    ...(filters.category && { category: filters.category }),
+    ...((filters.dateFrom || dateToEnd) && {
+      createdAt: {
+        ...(filters.dateFrom && { gte: filters.dateFrom }),
+        ...(dateToEnd && { lte: dateToEnd }),
+      },
+    }),
+    ...(filters.search && {
+      OR: [
+        { title: { contains: filters.search, mode: "insensitive" } },
+        { description: { contains: filters.search, mode: "insensitive" } },
+        { kota: { contains: filters.search, mode: "insensitive" } },
+      ],
+    }),
+  };
+}
+
 export const reportRepository = {
   async findMany(filters: ReportFilters, pagination: PaginationOptions) {
-    const where: Prisma.ReportWhereInput = {
-      ...(filters.provinsi && {
-        provinsi: { contains: filters.provinsi, mode: "insensitive" },
-      }),
-      ...(filters.kota && {
-        kota: { contains: filters.kota, mode: "insensitive" },
-      }),
-      ...(filters.kecamatan && {
-        kecamatan: { contains: filters.kecamatan, mode: "insensitive" },
-      }),
-      ...(filters.urgency && { urgency: filters.urgency }),
-      ...(filters.status && { status: filters.status }),
-      ...(filters.category && { category: filters.category }),
-      ...(filters.search && {
-        OR: [
-          { title: { contains: filters.search, mode: "insensitive" } },
-          { description: { contains: filters.search, mode: "insensitive" } },
-          { kota: { contains: filters.search, mode: "insensitive" } },
-        ],
-      }),
-    };
-
+    const where = buildWhere(filters);
     const currentPage = Math.max(1, pagination.page);
     const skip = (currentPage - 1) * pagination.limit;
 
@@ -85,7 +103,6 @@ export const reportRepository = {
     return { data, total };
   },
 
-  // Endpoint peta — hanya field yang dibutuhkan marker
   async findForMap(
     filters: Pick<ReportFilters, "provinsi" | "kota">,
     userId?: string,
@@ -118,15 +135,14 @@ export const reportRepository = {
         kota: true,
         provinsi: true,
         createdAt: true,
-        // Cek apakah user yang login sudah pernah upvote laporan ini
         upvotes: userId ? { where: { userId }, select: { id: true } } : false,
       },
-      take: 1000, // Batasi jumlah marker untuk mencegah overload di frontend,
+      take: 1000,
     });
   },
 
   async findById(id: string, userId?: string) {
-    const report = await prisma.report.findUnique({
+    return prisma.report.findUnique({
       where: { id },
       include: {
         author: { select: { id: true, name: true, image: true } },
@@ -134,7 +150,26 @@ export const reportRepository = {
         upvotes: userId ? { where: { userId }, select: { id: true } } : false,
       },
     });
-    return report;
+  },
+
+  async findForExport(filters: ReportFilters, userId?: string) {
+    const where = buildWhere(filters);
+
+    const [data, total] = await Promise.all([
+      prisma.report.findMany({
+        where,
+        take: 500,
+        orderBy: { createdAt: "desc" },
+        include: {
+          author: { select: { id: true, name: true, image: true } },
+          _count: { select: { upvotes: true } },
+          upvotes: userId ? { where: { userId }, select: { id: true } } : false,
+        },
+      }),
+      prisma.report.count({ where }),
+    ]);
+
+    return { data, total };
   },
 
   async create(data: Prisma.ReportCreateInput) {
