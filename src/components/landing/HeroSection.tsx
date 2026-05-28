@@ -9,7 +9,7 @@ const stats = [
   { value: "92%", label: "Akurasi Deteksi AI" },
 ];
 
-export function HeroSection(isLoggedIn: boolean) {
+export function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16 pb-6 ">
       {/* Background grid texture */}
@@ -60,8 +60,8 @@ export function HeroSection(isLoggedIn: boolean) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Button size="lg" className="gap-2 text-base px-8" asChild>
             {isLoggedIn ? (
-              <Link href="/dashboard">
-                Laporkan Sekarang
+              <Link href="/dashboard/reports">
+                Lihat Dashboard
                 <ArrowRight className="w-4 h-4" />
               </Link>
             ) : (
