@@ -7,6 +7,7 @@
  * Alur: Upload → Analyze → Hasil + CTA Buat Laporan
  */
 
+import React from "react";
 import { Sparkles, RotateCcw, ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +23,8 @@ export default function PlaygroundPage() {
     useAnalysis();
 
   const isAnalyzing =
-    phase === "reading" || phase === "scanning" || phase === "classifying";
+    phase === "reading" || phase === "uploading" || phase === "analyzing";
+
   const isDone = phase === "done";
   const isError = phase === "error";
 
@@ -104,7 +106,15 @@ export default function PlaygroundPage() {
           )}
 
           {/* ── Result card ── */}
-          {isDone && result && <AnalysisResultCard result={result} />}
+          {isDone && result && (
+            <AnalysisResultCard
+              result={
+                result as React.ComponentProps<
+                  typeof AnalysisResultCard
+                >["result"]
+              }
+            />
+          )}
 
           {/* ── Reset after done ── */}
           {isDone && (
