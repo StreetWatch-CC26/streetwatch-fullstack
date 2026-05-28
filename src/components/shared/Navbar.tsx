@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -116,9 +115,7 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
 // ==========================================
 // 2. KOMPONEN UTAMA NAVBAR (EKSTERNAL)
 // ==========================================
-export default function Navbar({ isLoggedIn }: NavbarProps) {
-  const pathname = usePathname();
-
+export default function Navbar({ isLoggedIn, pathname }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
