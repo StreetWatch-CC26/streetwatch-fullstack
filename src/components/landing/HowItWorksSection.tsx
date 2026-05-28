@@ -1,4 +1,4 @@
-import { Camera, Cpu, MapPinCheck, Wrench, Binoculars } from "lucide-react";
+import { Camera, Cpu, MapPinCheck, Binoculars } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const steps = [
@@ -30,13 +30,6 @@ const steps = [
     description:
       "Sistem otomatis mengirimkan laporan kepada pemerintah setempat dan warga dapat melihat perkembangan pada peta interaktif.",
   },
-  // {
-  //   icon: Wrench,
-  //   step: "04",
-  //   title: "Perbaikan & Update",
-  //   description:
-  //     "Tim lapangan ditugaskan, progres dipantau, dan pelapor mendapat notifikasi real-time hingga jalan selesai diperbaiki.",
-  // },
 ];
 
 export function HowItWorksSection() {
