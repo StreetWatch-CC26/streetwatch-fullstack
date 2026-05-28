@@ -451,8 +451,8 @@ streetwatch-fe
 
 ### v1.2 — Partnership Dashboard 📋
 
-- Role-based access control (warga vs. pemerintah vs. admin)
-- Dashboard Dinas PU: manajemen tim lapangan, SLA tracking
+- Role-based access control (warga vs. partnership vs. admin)
+- Dashboard partnership: manajemen tim lapangan, SLA tracking
 - Export laporan ke PDF/Excel
 - Integrasi sistem e-PU pemerintah daerah
 
