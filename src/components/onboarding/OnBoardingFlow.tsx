@@ -38,10 +38,18 @@ export default function OnboardingFlow() {
         <div className="flex justify-between items-center w-full mb-5 md:mb-8 shrink-0">
           <Image
             src="/logo-light.png"
-            alt="StreetWatch"
+            alt="Logo"
             width={120}
             height={40}
-            className="block"
+            className="block dark:hidden"
+          />
+          {/* Dark mode */}
+          <Image
+            src="/logo-dark.png"
+            alt="Logo"
+            width={120}
+            height={40}
+            className="hidden dark:block"
           />
 
           {/* Step counter + skip */}
