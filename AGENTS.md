@@ -130,7 +130,7 @@ npm install -D @types/bcryptjs
 3. Credentials → OAuth 2.0 Client ID:
    - Authorized redirect URIs:
      - `http://localhost:3000/api/auth/callback/google`
-     - `https://streetwatch.vercel.app/api/auth/callback/google`
+     - `https://streetwatchid.vercel.app/api/auth/callback/google`
 4. Catat `Client ID` dan `Client Secret`
 
 ### 0.4 File `.env.local`
