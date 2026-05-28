@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Scan, TrendingUp, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const stats = [
-  { value: "2.400+", label: "Laporan Terproses" },
+  { value: "1000+", label: "Laporan Terverifikasi" },
   { value: "18 Kota", label: "Wilayah Terjangkau" },
-  { value: "94%", label: "Akurasi Deteksi AI" },
+  { value: "92%", label: "Akurasi Deteksi AI" },
 ];
 
 export function HeroSection(isLoggedIn: boolean) {
@@ -93,105 +93,6 @@ export function HeroSection(isLoggedIn: boolean) {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-      {/* Dashboard Preview */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 mt-16">
-        <div className="relative rounded-2xl border border-border bg-card/60 backdrop-blur-sm shadow-2xl overflow-hidden">
-          {/* Browser chrome */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/50">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-destructive/70" />
-              <div className="w-3 h-3 rounded-full bg-yellow-400/70" />
-              <div className="w-3 h-3 rounded-full bg-green-400/70" />
-            </div>
-            <div className="flex-1 mx-4">
-              <div className="bg-background rounded-md px-3 py-1 text-xs text-muted-foreground border border-border max-w-xs mx-auto text-center">
-                streetwatch.vercel.app/dashboard
-              </div>
-            </div>
-          </div>
-          {/* Mock dashboard content */}
-          <div className="p-6 grid grid-cols-3 gap-4 min-h-70">
-            {/* Map placeholder */}
-            <div className="col-span-2 rounded-xl bg-muted/50 border border-border relative overflow-hidden">
-              <div
-                className="absolute inset-0 opacity-20"
-                style={{
-                  backgroundImage: `
-                    linear-gradient(to right, var(--primary) 1px, transparent 1px),
-                    linear-gradient(to bottom, var(--primary) 1px, transparent 1px)
-                  `,
-                  backgroundSize: "32px 32px",
-                }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <Scan className="w-8 h-8 text-primary mx-auto mb-2 opacity-60" />
-                  <p className="text-xs text-muted-foreground font-medium">
-                    Peta Kerusakan Real-time
-                  </p>
-                </div>
-              </div>
-              {/* Dots */}
-              {[
-                { top: "30%", left: "25%" },
-                { top: "55%", left: "60%" },
-                { top: "70%", left: "35%" },
-                { top: "40%", left: "70%" },
-              ].map((pos, i) => (
-                <div
-                  key={i}
-                  className="absolute w-3 h-3 rounded-full bg-primary shadow-lg shadow-primary/40"
-                  style={{ top: pos.top, left: pos.left }}
-                >
-                  <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-50" />
-                </div>
-              ))}
-            </div>
-
-            {/* Side stats */}
-            <div className="flex flex-col gap-3">
-              {[
-                {
-                  icon: TrendingUp,
-                  label: "Laporan Baru",
-                  value: "12 hari ini",
-                  color: "text-primary",
-                },
-                {
-                  icon: ShieldCheck,
-                  label: "Ditangani",
-                  value: "89 bulan ini",
-                  color: "text-green-500",
-                },
-                {
-                  icon: Scan,
-                  label: "Akurasi Deteksi AI",
-                  // Contoh teks: "Didukung oleh AI Vision dengan akurasi deteksi hingga 94.5%."
-                  value: "80% akurat",
-                  color: "text-blue-500",
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-xl border border-border bg-background p-3 flex items-center gap-3"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <item.icon className={`w-4 h-4 ${item.color}`} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">
-                      {item.label}
-                    </p>
-                    <p className="text-sm font-semibold text-foreground">
-                      {item.value}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </section>
