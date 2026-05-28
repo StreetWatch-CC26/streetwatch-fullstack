@@ -281,3 +281,21 @@ export function getPageMeta(pathname: string) {
   // 3. Fallback jika tidak ditemukan
   return { title: "Street Watch", subtitle: undefined };
 }
+
+export function formatDate(isoString: string): string {
+  return new Date(isoString).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function formatDateLong(isoString: string): string {
+  return new Date(isoString).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
