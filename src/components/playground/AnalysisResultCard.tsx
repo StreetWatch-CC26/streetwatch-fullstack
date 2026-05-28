@@ -22,13 +22,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  type AnalysisResult,
-  CATEGORY_LABEL,
-  LEVEL_LABEL,
-  LEVEL_CONFIG,
-} from "@/data/analysisSchema";
+import { CATEGORY_LABEL, LEVEL_CONFIG, LEVEL_LABEL } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { ReportItem } from "@/types/report";
+import { AnalysisResult } from "@/data/analysisSchema";
 
 // ── Score ring SVG ──────────────────────────────────────────────────────────
 
@@ -40,7 +37,7 @@ function ScoreRing({ score, hex }: { score: number; hex: string }) {
   const strokeDash = (score / 100) * circumference;
 
   return (
-    <svg width="80" height="80" viewBox="0 0 80 80" className="flex-shrink-0">
+    <svg width="80" height="80" viewBox="0 0 80 80" className="shrink-0">
       {/* Track */}
       <circle
         cx={cx}
@@ -96,26 +93,34 @@ function LevelIcon({
   level,
   className,
 }: {
-  level: AnalysisResult["level"];
+  level: ReportItem["urgency"];
   className?: string;
 }) {
-  const cls = cn("flex-shrink-0", className);
-  if (level === "rendah")
+  // FIX 3: Changed flex-shrink-0 to shrink-0
+  const cls = cn("shrink-0", className);
+  if (level === "low")
     return <CheckCircle2 className={cn(cls, "text-green-500")} />;
-  if (level === "sedang")
+  if (level === "medium")
     return <AlertTriangle className={cn(cls, "text-yellow-500")} />;
   return <XCircle className={cn(cls, "text-red-500")} />;
 }
 
 // ── Component ───────────────────────────────────────────────────────────────
 
+// FIX 2: Extended the intersection type to include summary, score, and analyzedAt
 interface Props {
-  result: AnalysisResult;
+  result: AnalysisResult & {
+    urgency: ReportItem["urgency"];
+    category: ReportItem["category"];
+    summary: string;
+    score: number;
+    analyzedAt: string | Date;
+  };
 }
 
 export function AnalysisResultCard({ result }: Props) {
   const router = useRouter();
-  const cfg = LEVEL_CONFIG[result.level];
+  const cfg = LEVEL_CONFIG[result.urgency];
 
   return (
     <div
@@ -133,7 +138,7 @@ export function AnalysisResultCard({ result }: Props) {
         )}
       >
         <div className="flex items-center gap-2.5">
-          <LevelIcon level={result.level} className="w-4.5 h-4.5" />
+          <LevelIcon level={result.urgency} className="w-4.5 h-4.5" />
           <div>
             <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
               Hasil Analisis
@@ -164,7 +169,7 @@ export function AnalysisResultCard({ result }: Props) {
               className="w-1.5 h-1.5 rounded-full inline-block"
               style={{ background: cfg.hex }}
             />
-            Kerusakan {LEVEL_LABEL[result.level]}
+            Kerusakan {LEVEL_LABEL[result.urgency]}
           </Badge>
           <Badge variant="outline" className="text-[10px] px-2 py-0.5 gap-1">
             <Tag className="w-2.5 h-2.5" />
@@ -196,7 +201,8 @@ export function AnalysisResultCard({ result }: Props) {
                   key={i}
                   className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed"
                 >
-                  <span className="mt-1 w-4 h-4 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 text-[9px] font-bold">
+                  {/* FIX 3: Changed flex-shrink-0 to shrink-0 */}
+                  <span className="mt-1 w-4 h-4 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[9px] font-bold">
                     {i + 1}
                   </span>
                   {rec}
