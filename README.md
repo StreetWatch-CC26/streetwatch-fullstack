@@ -449,7 +449,7 @@ streetwatch-fe
 - Ganti mock AI engine dengan Claude Vision API
 - Push notification (laporan diverifikasi / selesai)
 
-### v1.2 — Government Dashboard 📋
+### v1.2 — Partnership Dashboard 📋
 
 - Role-based access control (warga vs. pemerintah vs. admin)
 - Dashboard Dinas PU: manajemen tim lapangan, SLA tracking
