@@ -13,10 +13,19 @@ export interface AnalysisResult extends MLAnalysisResult {
 export type AnalysisPhase =
   | "idle"
   | "reading"
-  | "uploading" // Tambahan phase baru karena butuh upload URL
-  | "analyzing" // Mengganti scanning & classifying
+  | "uploading"
+  | "analyzing"
   | "done"
   | "error";
+
+export const PHASE_LABEL: Record<AnalysisPhase, string> = {
+  idle: "Menunggu",
+  reading: "Membaca Gambar...",
+  uploading: "Mengunggah Gambar...",
+  analyzing: "Menganalisis...",
+  done: "Selesai",
+  error: "Terjadi Kesalahan",
+};
 
 // ─── Recommendation bank ──────────────────────────────────────────────────────
 
