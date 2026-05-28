@@ -96,7 +96,6 @@ function LevelIcon({
   level: ReportItem["urgency"];
   className?: string;
 }) {
-  // FIX 3: Changed flex-shrink-0 to shrink-0
   const cls = cn("shrink-0", className);
   if (level === "low")
     return <CheckCircle2 className={cn(cls, "text-green-500")} />;
@@ -107,7 +106,6 @@ function LevelIcon({
 
 // ── Component ───────────────────────────────────────────────────────────────
 
-// FIX 2: Extended the intersection type to include summary, score, and analyzedAt
 interface Props {
   result: AnalysisResult & {
     urgency: ReportItem["urgency"];
