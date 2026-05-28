@@ -22,7 +22,7 @@ export async function POST(
 
     // Panggil service upvote (sudah menghandle logika toggle dan update count)
     const result = await upvoteService.toggle(
-      session.user.id,
+      session?.user?.id,
       resolvedParams.id,
     );
 
