@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu } from "lucide-react";
@@ -27,12 +28,12 @@ type NavbarProps = {
   isLoggedIn: boolean;
 };
 
-// ==========================================
-// 1. KOMPONEN MOBILE NAVBAR (INTERNAL)
-// ==========================================
+// KOMPONEN MOBILE NAVBAR (INTERNAL)
 function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
@@ -48,7 +49,6 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
           Menu
         </SheetTitle>
         <div className="flex flex-col h-full my-5 mx-3">
-          {/* LOGO */}
           <div className="items-center pb-3 mb-6 border-b border-border">
             <Image
               src="/logo-light.png"
@@ -57,7 +57,6 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
               height={40}
               className="block dark:hidden w-24 h-auto"
             />
-            {/* Dark mode */}
             <Image
               src="/logo-dark.png"
               alt="Logo"
@@ -67,7 +66,6 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
             />
           </div>
 
-          {/* NAV LINKS */}
           <nav className="flex flex-col gap-4 text-sm">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -76,6 +74,7 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setIsOpen(false)}
                   className={cn(
                     "relative transition-colors duration-200",
                     isActive
@@ -92,14 +91,21 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
             })}
           </nav>
 
-          {/* TOMBOL MASUK / DASHBOARD (MOBILE) */}
           <div className="mt-6">
             {isLoggedIn ? (
-              <Link href="/dashboard" className="w-full">
+              <Link
+                href="/dashboard"
+                className="w-full"
+                onClick={() => setIsOpen(false)}
+              >
                 <Button className="w-full">Dashboard</Button>
               </Link>
             ) : (
-              <Link href="/login" className="w-full">
+              <Link
+                href="/login"
+                className="w-full"
+                onClick={() => setIsOpen(false)}
+              >
                 <Button className="w-full">Masuk</Button>
               </Link>
             )}
@@ -116,14 +122,11 @@ function MobileNavbar({ pathname, isLoggedIn }: NavbarProps) {
   );
 }
 
-// ==========================================
-// 2. KOMPONEN UTAMA NAVBAR (EKSTERNAL)
-// ==========================================
+// KOMPONEN UTAMA NAVBAR (EKSTERNAL)
 export default function Navbar({ isLoggedIn, pathname }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
       <div className="container flex h-16 items-center justify-between px-5 md:px-20">
-        {/* LEFT */}
         <div className="flex items-center gap-2 md:gap-4">
           <MobileNavbar pathname={pathname} isLoggedIn={isLoggedIn} />
 
@@ -135,7 +138,6 @@ export default function Navbar({ isLoggedIn, pathname }: NavbarProps) {
               height={40}
               className="block dark:hidden w-24 md:w-26 lg:w-30 h-auto transition-all"
             />
-            {/* Dark mode */}
             <Image
               src="/logo-dark.png"
               alt="Logo"
@@ -146,7 +148,6 @@ export default function Navbar({ isLoggedIn, pathname }: NavbarProps) {
           </Link>
         </div>
 
-        {/* DESKTOP NAV */}
         <nav className="hidden md:flex items-center md:gap-3 lg:gap-10 md:text-xs lg:text-sm">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -171,7 +172,6 @@ export default function Navbar({ isLoggedIn, pathname }: NavbarProps) {
           })}
         </nav>
 
-        {/* RIGHT */}
         <div className="flex items-center gap-3">
           <ThemeToggle className="hidden md:flex" />
           {isLoggedIn ? (
