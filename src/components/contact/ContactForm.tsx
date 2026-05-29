@@ -15,7 +15,6 @@ import {
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 export default function ContactForm() {
-  // Ganti "YOUR_FORMSPREE_ID" dengan ID dari dashboard Formspree kamu
   const [state, handleSubmit] = useForm("YOUR_FORMSPREE_ID");
 
   if (state.succeeded) {
@@ -45,8 +44,8 @@ export default function ContactForm() {
   return (
     <Card className="shadow-lg border-border/50">
       <CardHeader>
-        <CardTitle className="text-2xl">Kirim Pesan</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-xl md:text-2xl">Kirim Pesan</CardTitle>
+        <CardDescription className="text-sm md:text-base">
           Isi form di bawah ini dan kami akan segera menghubungi Anda.
         </CardDescription>
       </CardHeader>
@@ -54,7 +53,9 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">Nama Depan</Label>
+              <Label htmlFor="firstName">
+                Nama Depan<span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="firstName"
                 name="firstName"
@@ -63,7 +64,9 @@ export default function ContactForm() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">Nama Belakang</Label>
+              <Label htmlFor="lastName">
+                Nama Belakang<span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="lastName"
                 name="lastName"
@@ -74,7 +77,9 @@ export default function ContactForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">
+              Email<span className="text-destructive">*</span>
+            </Label>
             <Input
               id="email"
               type="email"
@@ -91,7 +96,9 @@ export default function ContactForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="subject">Subjek</Label>
+            <Label htmlFor="subject">
+              Subjek<span className="text-destructive">*</span>
+            </Label>
             <Input
               id="subject"
               name="subject"
@@ -101,7 +108,9 @@ export default function ContactForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message">Pesan</Label>
+            <Label htmlFor="message">
+              Pesan<span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="message"
               name="message"
