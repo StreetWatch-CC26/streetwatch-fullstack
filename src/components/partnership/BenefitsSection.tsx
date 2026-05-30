@@ -48,39 +48,39 @@ const benefits = [
 
 export function BenefitsSection() {
   return (
-    <section className="py-20 lg:py-28">
+    <section className="py-16 md:py-24 lg:py-32 px-5 md:px-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="grid lg:grid-cols-[360px_1fr] gap-16 items-start">
+        <div className="grid lg:grid-cols-[360px_1fr] gap-10 md:gap-16 items-start">
           <div className="lg:sticky lg:top-28">
             <p className="text-xs font-semibold text-primary uppercase tracking-[0.2em] mb-4">
               Mengapa Bermitra
             </p>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight mb-5">
-              Nilai yang kami
-              bawa untuk mitra.
+              Nilai yang kami bawa untuk mitra.
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Bukan sekadar perangkat lunak — kami adalah mitra strategis yang
-              berkomitmen pada keberhasilan transformasi digital layanan publik kamu.
+              Bukan sekadar perangkat lunak, kami adalah mitra strategis yang
+              berkomitmen pada keberhasilan transformasi digital layanan publik
+              kamu.
             </p>
 
             {/* Quote block */}
             <div className="mt-8 rounded-2xl bg-muted/50 border border-border p-5">
               <p className="text-sm text-foreground italic leading-relaxed mb-3">
-                "Implementasi StreetWatch mengubah cara kerja dinas kami secara
-                fundamental. Sekarang kami bisa justifikasi anggaran perbaikan
-                jalan dengan data yang solid."
+                &quot;Implementasi StreetWatch mengubah cara kerja dinas kami
+                secara fundamental. Sekarang kami bisa justifikasi anggaran
+                perbaikan jalan dengan data yang solid.&quot;
               </p>
               <div className="text-xs text-muted-foreground font-medium">
-                — Kepala Dinas PU, Kota Batam
+                — Kepala Dinas PU, Kota Medan
               </div>
             </div>
           </div>
 
           {/* Benefits grid */}
-          <div className="grid sm:grid-cols-2 gap-5">
-            {benefits.map((benefit, i) => (
+          <div className="grid sm:grid-cols-2 gap-3 md:gap-5">
+            {benefits.map((benefit) => (
               <div
                 key={benefit.title}
                 className="group rounded-2xl border border-border bg-card p-5 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5 transition-all duration-300"

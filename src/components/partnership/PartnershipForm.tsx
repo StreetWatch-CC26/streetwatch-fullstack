@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle, Send, Mail, Phone } from "lucide-react";
+import { CheckCircle, Send, Mail, Phone, Loader2 } from "lucide-react";
+import { useForm, ValidationError } from "@formspree/react";
 
 const partnerTypes = [
   "Pemerintah Kota/Kabupaten",
@@ -25,20 +25,15 @@ const partnerTypes = [
 ];
 
 export function PartnershipForm() {
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    // Simulate API call — replace with actual endpoint
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setSubmitted(true);
-  }
+  const [state, handleSubmit] = useForm(
+    process.env.NEXT_PUBLIC_FORMSPREE_ID as string,
+  );
 
   return (
-    <section id="partnership-form" className="py-20 lg:py-28">
+    <section
+      id="partnership-form"
+      className="py-16 md:py-24 lg:py-32 px-5 md:px-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-[360px_1fr] gap-16 items-start">
           {/* Left info */}
@@ -106,7 +101,7 @@ export function PartnershipForm() {
 
           {/* Form */}
           <div className="rounded-2xl border border-border bg-card p-8">
-            {submitted ? (
+            {state.succeeded ? (
               <div className="flex flex-col items-center justify-center text-center py-12 gap-4">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                   <CheckCircle className="w-8 h-8 text-primary" />
@@ -151,6 +146,12 @@ export function PartnershipForm() {
                       placeholder="budi@pemkot.go.id"
                       required
                       className="bg-background"
+                    />
+                    <ValidationError
+                      prefix="Email"
+                      field="email"
+                      errors={state.errors}
+                      className="text-destructive text-sm"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -209,26 +210,38 @@ export function PartnershipForm() {
                     rows={4}
                     className="bg-background resize-none"
                   />
+                  <ValidationError
+                    prefix="Message"
+                    field="message"
+                    errors={state.errors}
+                    className="text-destructive text-sm"
+                  />
                 </div>
 
                 <Button
                   type="submit"
                   size="lg"
                   className="w-full gap-2"
-                  disabled={loading}
+                  disabled={state.submitting}
                 >
-                  {loading ? (
+                  {state.submitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Mengirim...
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
+                      <Send className="mt-2 h-4 w-4" />
                       Kirim Formulir Kemitraan
                     </>
                   )}
                 </Button>
+
+                {state.errors && (
+                  <p className="text-destructive text-sm text-center">
+                    Terjadi kesalahan. Silakan coba lagi nanti.
+                  </p>
+                )}
 
                 <p className="text-xs text-muted-foreground text-center">
                   Dengan mengirim formulir ini, kamu menyetujui{" "}

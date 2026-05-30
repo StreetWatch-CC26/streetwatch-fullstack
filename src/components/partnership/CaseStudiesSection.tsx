@@ -34,9 +34,9 @@ const caseStudies = [
 
 export function CaseStudiesSection() {
   return (
-    <section className="py-20 lg:py-28 bg-muted/30">
+    <section className="py-16 md:py-24 lg:py-32 px-5 md:px-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
+        <div className="mb-6 md:mb-12">
           <p className="text-xs font-semibold text-primary uppercase tracking-[0.2em] mb-3">
             Studi Kasus
           </p>
@@ -45,15 +45,15 @@ export function CaseStudiesSection() {
               Hasil nyata dari mitra kami.
             </h2>
             <Link
-              href="/case-studies"
-              className="text-sm font-semibold text-primary hover:underline underline-offset-4 flex items-center gap-1 flex-shrink-0"
+              href="#"
+              className="text-sm font-semibold text-primary hover:underline underline-offset-4 flex items-center gap-1 shrink-0"
             >
               Lihat semua studi kasus <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-2 gap-3 md:gap-6">
           {caseStudies.map((cs) => (
             <div
               key={cs.city}
@@ -62,8 +62,12 @@ export function CaseStudiesSection() {
               {/* Card header */}
               <div className="bg-primary/5 border-b border-border px-6 py-4 flex items-center justify-between">
                 <div>
-                  <div className="font-heading font-bold text-foreground">{cs.city}</div>
-                  <div className="text-xs text-muted-foreground">{cs.province}</div>
+                  <div className="font-heading font-bold text-foreground">
+                    {cs.city}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {cs.province}
+                  </div>
                 </div>
                 <span className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-full">
                   {cs.tag}

@@ -72,16 +72,15 @@ const tiers = [
 
 export function PartnershipTiers() {
   return (
-    <section className="py-20 lg:py-28 bg-muted/30">
+    <section className="py-16 md:py-24 lg:py-32 px-5 md:px-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-7 md:mb-14">
           <p className="text-xs font-semibold text-primary uppercase tracking-[0.2em] mb-3">
             Paket Kemitraan
           </p>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-            Pilih model kemitraan
-            <br className="hidden sm:block" />
+            Pilih model kemitraan <br className="hidden sm:block" />
             yang sesuai dengan kebutuhanmu
           </h2>
         </div>
@@ -95,7 +94,7 @@ export function PartnershipTiers() {
                 "relative rounded-2xl border p-6 flex flex-col",
                 tier.highlight
                   ? "border-primary bg-primary text-primary-foreground shadow-2xl shadow-primary/20 lg:-mt-4 lg:-mb-4 lg:py-10"
-                  : "border-border bg-card"
+                  : "border-border bg-card",
               )}
             >
               {tier.badge && (
@@ -108,41 +107,65 @@ export function PartnershipTiers() {
 
               {/* Header */}
               <div className="mb-6">
-                <div className={cn(
-                  "text-xs font-semibold uppercase tracking-[0.15em] mb-1",
-                  tier.highlight ? "text-primary-foreground/70" : "text-primary"
-                )}>
+                <div
+                  className={cn(
+                    "text-xs font-semibold uppercase tracking-[0.15em] mb-1",
+                    tier.highlight
+                      ? "text-primary-foreground/70"
+                      : "text-primary",
+                  )}
+                >
                   {tier.target}
                 </div>
-                <h3 className={cn(
-                  "font-heading text-2xl font-bold mb-1",
-                  tier.highlight ? "text-primary-foreground" : "text-foreground"
-                )}>
+                <h3
+                  className={cn(
+                    "font-heading text-2xl font-bold mb-1",
+                    tier.highlight
+                      ? "text-primary-foreground"
+                      : "text-foreground",
+                  )}
+                >
                   {tier.name}
                 </h3>
-                <p className={cn(
-                  "text-sm leading-relaxed",
-                  tier.highlight ? "text-primary-foreground/75" : "text-muted-foreground"
-                )}>
+                <p
+                  className={cn(
+                    "text-sm leading-relaxed",
+                    tier.highlight
+                      ? "text-primary-foreground/75"
+                      : "text-muted-foreground",
+                  )}
+                >
                   {tier.description}
                 </p>
               </div>
 
               {/* Price */}
-              <div className={cn(
-                "py-4 border-y mb-6",
-                tier.highlight ? "border-primary-foreground/20" : "border-border"
-              )}>
-                <div className={cn(
-                  "font-heading text-3xl font-bold",
-                  tier.highlight ? "text-primary-foreground" : "text-foreground"
-                )}>
+              <div
+                className={cn(
+                  "py-4 border-y mb-6",
+                  tier.highlight
+                    ? "border-primary-foreground/20"
+                    : "border-border",
+                )}
+              >
+                <div
+                  className={cn(
+                    "font-heading text-3xl font-bold",
+                    tier.highlight
+                      ? "text-primary-foreground"
+                      : "text-foreground",
+                  )}
+                >
                   {tier.price}
                 </div>
-                <div className={cn(
-                  "text-xs mt-0.5",
-                  tier.highlight ? "text-primary-foreground/60" : "text-muted-foreground"
-                )}>
+                <div
+                  className={cn(
+                    "text-xs mt-0.5",
+                    tier.highlight
+                      ? "text-primary-foreground/60"
+                      : "text-muted-foreground",
+                  )}
+                >
                   {tier.priceSub}
                 </div>
               </div>
@@ -151,19 +174,31 @@ export function PartnershipTiers() {
               <ul className="space-y-2.5 flex-1 mb-8">
                 {tier.features.map((feat) => (
                   <li key={feat} className="flex items-start gap-2.5">
-                    <div className={cn(
-                      "w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5",
-                      tier.highlight ? "bg-primary-foreground/20" : "bg-primary/10"
-                    )}>
-                      <Check className={cn(
-                        "w-2.5 h-2.5",
-                        tier.highlight ? "text-primary-foreground" : "text-primary"
-                      )} />
+                    <div
+                      className={cn(
+                        "w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+                        tier.highlight
+                          ? "bg-primary-foreground/20"
+                          : "bg-primary/10",
+                      )}
+                    >
+                      <Check
+                        className={cn(
+                          "w-2.5 h-2.5",
+                          tier.highlight
+                            ? "text-primary-foreground"
+                            : "text-primary",
+                        )}
+                      />
                     </div>
-                    <span className={cn(
-                      "text-sm",
-                      tier.highlight ? "text-primary-foreground/85" : "text-muted-foreground"
-                    )}>
+                    <span
+                      className={cn(
+                        "text-sm",
+                        tier.highlight
+                          ? "text-primary-foreground/85"
+                          : "text-muted-foreground",
+                      )}
+                    >
                       {feat}
                     </span>
                   </li>
@@ -177,7 +212,7 @@ export function PartnershipTiers() {
                   "w-full",
                   tier.highlight
                     ? "bg-white text-primary hover:bg-white/90"
-                    : ""
+                    : "",
                 )}
                 variant={tier.highlight ? "default" : "outline"}
                 asChild

@@ -45,25 +45,25 @@ const steps = [
 
 export function ProcessSection() {
   return (
-    <section className="py-20 lg:py-28 bg-muted/30">
+    <section className="py-16 md:py-24 lg:py-32 px-5 md:px-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-7 md:mb-14">
           <p className="text-xs font-semibold text-primary uppercase tracking-[0.2em] mb-3">
             Proses Onboarding
           </p>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-            Dari formulir ke go-live
-            <br className="hidden sm:block" />
+            Dari formulir ke go-live <br className="hidden sm:block" />
             dalam 3 bulan.
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            Kami mengelola seluruh proses implementasi — kamu fokus pada pelayanan publik.
+            Kami mengelola seluruh proses implementasi, kamu fokus pada
+            pelayanan publik.
           </p>
         </div>
 
         {/* Steps grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
           {steps.map((step) => (
             <div
               key={step.number}
