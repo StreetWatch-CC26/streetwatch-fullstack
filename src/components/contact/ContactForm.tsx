@@ -15,7 +15,9 @@ import {
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 export default function ContactForm() {
-  const [state, handleSubmit] = useForm("YOUR_FORMSPREE_ID");
+  const [state, handleSubmit] = useForm(
+    process.env.NEXT_PUBLIC_FORMSPREE_ID as string,
+  );
 
   if (state.succeeded) {
     return (
