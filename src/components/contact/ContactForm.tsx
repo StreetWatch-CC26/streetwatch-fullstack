@@ -21,7 +21,7 @@ export default function ContactForm() {
 
   if (state.succeeded) {
     return (
-      <Card className="border-primary/20 bg-primary/5">
+      <Card className="border-primary/20 bg-primary/5 py-5">
         <CardContent className="pt-6 text-center space-y-4">
           <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
           <div className="space-y-2">
@@ -44,7 +44,7 @@ export default function ContactForm() {
   }
 
   return (
-    <Card className="shadow-lg border-border/50">
+    <Card className="shadow-lg border-border/50 py-5">
       <CardHeader>
         <CardTitle className="text-xl md:text-2xl">Kirim Pesan</CardTitle>
         <CardDescription className="text-sm md:text-base">

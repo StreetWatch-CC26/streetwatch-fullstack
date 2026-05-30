@@ -5,12 +5,12 @@ export default function ContactPage() {
   return (
     <div
       id="contact"
-      className="min-h-screen bg-background text-foreground py-10 px-4 md:py-20"
+      className="min-h-screen bg-background text-foreground pt-8 lg:pt-20 pb-16 md:pb-24 lg:pb-32 px-5 md:px-20"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-10 md:mb-16">
-          <h1 className="text-2xl md:text-5xl font-heading font-bold tracking-tight mb-4">
+          <h1 className="text-3xl md:text-5xl font-heading font-bold tracking-tight mb-4">
             Hubungi Kami
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base lg:text-lg">
@@ -26,9 +26,9 @@ export default function ContactPage() {
                 <RiMapPin2Line className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-base md:text-lg font-semibold mb-1">
+                <h2 className="text-base md:text-lg font-semibold mb-1">
                   Lokasi Kami
-                </h3>
+                </h2>
                 <p className="text-muted-foreground text-xs md:text-sm lg:text-base">
                   Indonesia
                 </p>
@@ -40,9 +40,9 @@ export default function ContactPage() {
                 <RiMailLine className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-base md:text-lg font-semibold mb-1">
+                <h2 className="text-base md:text-lg font-semibold mb-1">
                   Email
-                </h3>
+                </h2>
                 <p className="text-muted-foreground text-xs md:text-sm lg:text-base">
                   streetwatch.ai@gmail.com
                 </p>
@@ -54,9 +54,9 @@ export default function ContactPage() {
                 <RiInstagramLine className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h3 className="text-base md:text-lg font-semibold mb-1">
+                <h2 className="text-base md:text-lg font-semibold mb-1">
                   Instagram
-                </h3>
+                </h2>
                 <p className="text-muted-foreground text-xs md:text-sm lg:text-base">
                   streetwatch.ai
                 </p>
@@ -64,7 +64,6 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* Form Section - Prioritas tinggi di Mobile */}
           <div className="order-1 lg:order-2">
             <ContactForm />
           </div>
