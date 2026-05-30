@@ -43,7 +43,7 @@ export function HeroSection({ isLoggedIn }: { isLoggedIn: boolean }) {
         </div>
 
         {/* Headline */}
-        <h1 className="font-heading text-3xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05] mb-6">
+        <h1 className="font-heading text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05] mb-6">
           Laporkan Jalan Rusak.
           <br />
           <span className="text-primary">Diperbaiki Lebih Cepat.</span>

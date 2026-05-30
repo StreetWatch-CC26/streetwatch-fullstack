@@ -44,8 +44,8 @@ export function ImpactSection() {
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">
             Dampak Nyata
           </p>
-          <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
-            Ribuan jalan lebih aman,
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
+            Ribuan jalan lebih aman, {" "}
             <br className="hidden sm:block" />
             berkat komunitas
           </h2>

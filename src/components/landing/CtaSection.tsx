@@ -22,7 +22,7 @@ export function CTASection() {
           <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-white/10 blur-2xl" />
 
           <div className="relative z-10">
-            <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight">
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4 tracking-tight">
               Bergabung sekarang.
               <br />
               Jadikan jalananmu lebih aman.

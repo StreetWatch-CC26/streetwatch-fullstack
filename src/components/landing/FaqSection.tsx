@@ -43,7 +43,7 @@ export function FAQSection() {
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">
             FAQ
           </p>
-          <h2 className="font-heading text-2xl sm:text-4xl font-bold text-foreground tracking-tight">
+          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
             Pertanyaan yang sering ditanyakan
           </h2>
         </div>

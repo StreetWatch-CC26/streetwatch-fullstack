@@ -44,7 +44,7 @@ export function HowItWorksSection() {
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">
             Cara Kerja
           </p>
-          <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
+          <h2 className="font-heading text-4xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
             Dari laporan ke perbaikan,
             <br className="block" />
             dalam 4 langkah

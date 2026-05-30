@@ -45,7 +45,7 @@ export function FeaturesSection() {
           <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-3">
             Fitur Platform
           </p>
-          <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
+          <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
             Semua yang dibutuhkan untuk
             <br className="block" />
             infrastruktur yang lebih baik
