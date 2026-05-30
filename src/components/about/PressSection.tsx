@@ -6,8 +6,7 @@ const pressLogos = [
     name: "Coding Camp Powered By DBS Foundation",
     src: "/images/sponsors/coding-camp-logo.svg",
   },
-  // { name: "DBS Foundation", src: "/images/sponsors/dbs-logo.svg" },
-  // { name: "Dicoding Indonesia", src: "/images/sponsors/dicoding-logo.svg" },
+  { name: "Dicoding Indonesia", src: "/images/sponsors/dicoding-logo.svg" },
 ];
 
 const awards = [
@@ -20,7 +19,7 @@ const awards = [
 
 export function PressSection() {
   return (
-    <section className="py-20 border-t border-border bg-muted/20">
+    <section className="py-16 md:py-24 lg:py-32 px-5 md:px-20 border-t border-border bg-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Press logos */}
         <div className="text-center mb-10">
@@ -29,13 +28,13 @@ export function PressSection() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8">
             {pressLogos.map((logo) => (
-              <div key={logo.name} className="h-8 w-auto transition">
+              <div key={logo.name} className="h-auto w-auto transition">
                 <Image
                   src={logo.src}
                   alt={logo.name}
                   width={120}
-                  height={32}
-                  className="object-contain transition bg-white rounded-md p-1 "
+                  height={60}
+                  className="object-contain transition bg-white rounded-md p-1 md:p-3"
                 />
               </div>
             ))}

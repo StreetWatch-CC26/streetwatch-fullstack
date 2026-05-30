@@ -9,32 +9,21 @@ import Link from "next/link";
 const team = [
   {
     name: "Ali Musthafa Kamal",
-    role: "Team Lead & Frontend Developer",
+    role: "Team Lead & Full Stack Developer",
     image: "/images/avatars/ali.jpg",
     initials: "AMK",
-    bio: "Mahasiswa Akhir dari Universitas Riau. Pernah mengikuti Coding Camp 2025.",
+    bio: "S1 Sistem Informasi Universitas Riau sekaligus Full Stack Web Developer yang bersemangat dengan pengalaman lebih dari satu tahun, saya mengkhususkan diri dalam membangun aplikasi web modern, terukur, dan berkinerja tinggi, terutama menggunakan MERN stack (MongoDB, Express, React, Node.js) dan ekosistem Next.js",
     links: {
       linkedin: "https://www.linkedin.com/in/alimusthafakamal/",
       instagram: "https://instagram.com/alimusthafa10/",
       github: "https://github.com/kamaldev10/",
     },
   },
-  {
-    name: "Rangga Adi",
-    role: "Backend Developer",
-    image: "/images/avatars/ali.jpg",
-    initials: "RA",
-    bio: "10 tahun di sektor publik. Jembatan antara StreetWatch dan pemerintah daerah.",
-    links: {
-      linkedin: "linkedin.com/in/ranggaadin/",
-      instagram: null,
-      github: null,
-    },
-  },
+
   {
     name: "Firza Hakim",
     role: "AI Engineer",
-    image: "/images/avatars/ali.jpg",
+    image: "/images/avatars/firza.jpg",
     initials: "FH",
     bio: "PhD Computer Vision dari UI. Membangun model AI deteksi kerusakan dari nol.",
     links: {
@@ -47,7 +36,7 @@ const team = [
   {
     name: "⁠Dzakiya Hakima Adila",
     role: "AI Engineer",
-    image: "/images/avatars/ali.jpg",
+    image: "/images/avatars/kiya.jpg",
     initials: "DHA",
     bio: "Ex-Tokopedia design lead. Membuat teknologi kompleks terasa sederhana bagi semua orang.",
     links: {
@@ -59,7 +48,7 @@ const team = [
   {
     name: "Della Nurizki",
     role: "Data Scientist",
-    image: "/images/avatars/ali.jpg",
+    image: "/images/avatars/della.jpg",
     initials: "DN",
     bio: "Full-stack + DevOps. Menjaga StreetWatch tetap berjalan 24/7 dengan uptime 99.9%.",
     links: {
@@ -71,7 +60,7 @@ const team = [
   {
     name: "Moch.Alif Budi Setyawan",
     role: "Data Scientist",
-    image: "/images/avatars/ali.jpg",
+    image: "/images/avatars/alif.jpg",
     initials: "ABS",
     bio: "Membangun jaringan 50.000+ pelapor aktif dan menjaga hubungan komunitas di 18 kota.",
     links: {
@@ -80,9 +69,20 @@ const team = [
       github: null,
     },
   },
+  {
+    name: "Rangga Adi",
+    role: "Backend Developer",
+    image: "/images/avatars/rangga.jpg",
+    initials: "RA",
+    bio: "10 tahun di sektor publik. Jembatan antara StreetWatch dan pemerintah daerah.",
+    links: {
+      linkedin: "linkedin.com/in/ranggaadin/",
+      instagram: null,
+      github: null,
+    },
+  },
 ];
 
-// Cycle through a set of muted accent backgrounds
 const avatarColors = [
   "bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300",
   "bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300",
@@ -94,11 +94,11 @@ const avatarColors = [
 
 export function TeamSection() {
   return (
-    <section className="py-20 lg:py-28 bg-muted/30">
+    <section className="py-16 md:py-24 lg:py-32 px-5 md:px-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-14">
-          <p className="text-xs font-semibold text-primary uppercase tracking-[0.2em] mb-3">
+        <div className="mb-7 md:mb-14">
+          <p className="text-xs md:text-base font-semibold text-primary uppercase tracking-[0.2em] mb-3">
             Tim Kami
           </p>
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 justify-between">
@@ -113,7 +113,7 @@ export function TeamSection() {
         </div>
 
         {/* Team grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
           {team.map((member, i) => (
             <div
               key={member.name}
@@ -146,7 +146,7 @@ export function TeamSection() {
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed flex-1">
                 {member.bio}
               </p>
 

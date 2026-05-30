@@ -23,7 +23,7 @@ const pillars = [
 
 export function MissionSection() {
   return (
-    <section className="py-20 lg:py-28">
+    <section className="py-16 md:py-24 lg:py-32 px-5 md:px-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
           {/* Story */}
@@ -31,10 +31,10 @@ export function MissionSection() {
             <p className="text-xs font-semibold text-primary uppercase tracking-[0.2em] mb-5">
               Cerita Kami
             </p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-foreground tracking-tight mb-6 leading-tight">
+            <h2 className="font-heading text-2xl sm:text-4xl font-bold text-foreground tracking-tight mb-3 md:b-6 leading-tight">
               Dimulai dari satu lubang jalan dan sebuah pertanyaan sederhana.
             </h2>
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
+            <div className="text-sm md:text-base space-y-4 text-muted-foreground leading-relaxed">
               <p>
                 Pada 2025, salah satu pendiri kami, Firza mengalami kecelakaan
                 ringan akibat lubang jalan di ketika pulang dari KKN. Ia melapor
@@ -49,9 +49,9 @@ export function MissionSection() {
               </p>
               <p>
                 Bersama tim kecil dari Coding Camp 2026, Firza mulai membangun
-                prototipe pertama StreetWatch, sebuah form sederhana yang
-                mengirim foto kerusakan jalan langsung ke email kepala dinas.
-                Dalam dua minggu, lubang itu ditambal.
+                prototipe pertama StreetWatch, sebuah sistem sederhana yang
+                menganalisis foto kerusakan jalan dan dapat memonitoring
+                kerusakan jalan di Indonesia.
               </p>
               <p>
                 Dari satu lubang, kami berkembang menjadi platform yang kini
@@ -94,21 +94,21 @@ export function MissionSection() {
           </div>
 
           {/* Misi / Visi / Nilai */}
-          <div className="space-y-5">
+          <div className="space-y-3 not-[]:md:space-y-5">
             {pillars.map((pillar) => (
               <div
                 key={pillar.title}
-                className="group rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
+                className="group rounded-2xl border border-border bg-card p-3 md:p-6 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <div className="w-6 md:w-10 h-6 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
                     <pillar.icon className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-heading text-lg font-bold text-foreground mb-2">
+                    <h3 className="font-heading text-sm md:text-lg font-bold text-foreground mb-2">
                       {pillar.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
                       {pillar.content}
                     </p>
                   </div>
@@ -117,15 +117,17 @@ export function MissionSection() {
             ))}
 
             {/* Stat highlight */}
-            <div className="rounded-2xl bg-primary p-6 text-primary-foreground">
-              <div className="font-heading text-4xl font-bold mb-1">75%</div>
-              <div className="text-sm text-primary-foreground/80 leading-relaxed">
+            <div className="rounded-2xl bg-primary p-3 md:p-6 text-primary-foreground">
+              <div className="font-heading text-3xl md:text-4xl font-bold mb-1">
+                75%
+              </div>
+              <div className="text-xs md:text-sm text-primary-foreground/80 leading-relaxed">
                 laporan terverifikasi di StreetWatch mendapat respons dari
                 pemerintah daerah dalam{" "}
                 <strong className="text-primary-foreground">
                   7 hari kerja
                 </strong>{" "}
-                — jauh di atas rata-rata nasional.
+                jauh di atas rata-rata nasional.
               </div>
             </div>
           </div>
