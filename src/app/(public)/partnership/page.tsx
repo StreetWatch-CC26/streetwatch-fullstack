@@ -25,7 +25,7 @@ export default function PartnershipPage() {
     <>
       <main>
         <PartnershipHero />
-        {/* <PartnershipTiers /> */}
+        <PartnershipTiers />
         <BenefitsSection />
         <ProcessSection />
         <CaseStudiesSection />
