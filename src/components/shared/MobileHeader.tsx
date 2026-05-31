@@ -7,15 +7,15 @@ import { BackButton } from "./BackButton";
 import { getPageMeta } from "@/lib/utils";
 
 export function MobileHeader() {
-  const pathname = usePathname();
-  const { title } = getPageMeta(pathname ?? "");
+  const pathname = usePathname() || "";
+  const { title } = getPageMeta(pathname);
 
-  // hide pada halaman dashboard/reports
-  if (pathname?.startsWith("/dashboard/reports")) return null;
+  const matchDetailRoute = pathname.match(/^\/dashboard\/reports\/([^/]+)$/);
+
+  if (matchDetailRoute) return null;
 
   return (
     <header className="sm:hidden flex items-center justify-between px-4 h-14 shrink-0 bg-background/80 backdrop-blur-md border-b border-border/60">
-      {/* back button + page title */}
       <div className="flex items-center gap-2.5">
         <BackButton />
         <Separator orientation="vertical" />
@@ -26,7 +26,6 @@ export function MobileHeader() {
         </div>
       </div>
 
-      {/* Right actions */}
       <div className="flex items-center gap-2.5">
         <Separator orientation="vertical" />
         <ThemeToggle />
