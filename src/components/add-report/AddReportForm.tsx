@@ -8,26 +8,34 @@ import { LocationPicker } from "./LocationPicker";
 import { FormInput } from "./FormInput";
 import { FormTextarea } from "./FormTextarea";
 import { FormSelect } from "./FormSelect";
+import { SubmitLoadingOverlay, type SubmitStep } from "./SubmitLoadingOverlay";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Loader2,
   MapPin,
   Send,
-  X,
   ImageOff,
-  BrainCircuit,
-  Upload,
-  CheckCircle2,
+  AlertCircle,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { compressImage, getCurrentLocation, reverseGeocode } from "@/lib/utils";
+import {
+  base64ToFile,
+  compressImage,
+  getCurrentLocation,
+  reverseGeocode,
+} from "@/lib/utils";
 import { DamageCategory } from "@/generated/prisma/enums";
 import { useAnalysisStore } from "@/stores/analysis.store";
-
-// ── Tipe lokal ────────────────────────────────────────────────────────────────
 
 interface FormData {
   title: string;
@@ -45,7 +53,6 @@ interface FormData {
 }
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
-type SubmitStep = "uploading" | "analyzing" | "saving" | null;
 
 const INITIAL: FormData = {
   title: "",
@@ -62,50 +69,6 @@ const INITIAL: FormData = {
   provinsi: "",
 };
 
-const STEP_CONFIG: Record<
-  Exclude<SubmitStep, null>,
-  {
-    label: string;
-    sublabel: string;
-    icon: React.ReactNode;
-    cancelable: boolean;
-  }
-> = {
-  uploading: {
-    label: "Mengupload foto…",
-    sublabel: "Mengunggah gambar ke server",
-    icon: <Upload className="w-5 h-5" />,
-    cancelable: true,
-  },
-  analyzing: {
-    label: "Menganalisis kerusakan…",
-    sublabel: "AI sedang memvalidasi foto jalan",
-    icon: <BrainCircuit className="w-5 h-5" />,
-    cancelable: true,
-  },
-  saving: {
-    label: "Menyimpan laporan…",
-    sublabel: "Hampir selesai",
-    icon: <CheckCircle2 className="w-5 h-5" />,
-    cancelable: false,
-  },
-};
-
-// ── Helper: Konversi Base64 ke File ───────────────────────────────────────────
-function base64ToFile(base64: string, filename: string): File {
-  const arr = base64.split(",");
-  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
-}
-
-// ── Komponen ──────────────────────────────────────────────────────────────────
-
 export function AddReportForm() {
   const router = useRouter();
 
@@ -114,10 +77,8 @@ export function AddReportForm() {
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // State indikator agar integrasi state global hanya berjalan 1x
   const hasProcessedStore = useRef(false);
 
-  // Akses global state dari Zustand
   const {
     result,
     imagePreview: storePreview,
@@ -130,28 +91,22 @@ export function AddReportForm() {
 
   const isSubmitting = submitStep !== null;
 
-  // ── Inject Data dari Global Store (Playground) ───────────────────────────
   useEffect(() => {
-    // 1. Jika data belum tersedia (proses hidrasi Zustand), hentikan eksekusi
     if (!storePreview || !result) return;
-
-    // 2. Cegah agar proses ini hanya berjalan 1x, tidak berulang-ulang
     if (hasProcessedStore.current) return;
     hasProcessedStore.current = true;
 
-    // 3. Gunakan setTimeout agar setState berjalan secara asynchronous.
     const timer = setTimeout(() => {
       try {
         const file = base64ToFile(
           storePreview,
           imageName || "playground-image.jpg",
         );
-
         const defaultCategory: DamageCategory | "" = result.isDamageDetected
           ? "lubang"
           : "";
-
         let aiDescription = "";
+
         if (result.isDamageDetected && result.recommendations?.length) {
           aiDescription = `Catatan AI: Terdeteksi ${result.totalPotholes} titik kerusakan (Tingkat: ${result.rawSeverity}).\n\nRekomendasi Penanganan:\n${result.recommendations.map((r) => "- " + r).join("\n")}`;
         }
@@ -163,12 +118,10 @@ export function AddReportForm() {
           category: defaultCategory,
           description: aiDescription,
         }));
-
         toast.success("Gambar dan hasil dari Playground berhasil dimuat!");
       } catch (err) {
         console.error("Gagal mengurai gambar dari session store", err);
       } finally {
-        // Bersihkan store
         clearStore();
       }
     }, 0);
@@ -176,7 +129,6 @@ export function AddReportForm() {
     return () => clearTimeout(timer);
   }, [storePreview, result, imageName, clearStore]);
 
-  // ── Auto-detect GPS ──────────────────────────────────────────────────────
   useEffect(() => {
     (async () => {
       try {
@@ -197,7 +149,6 @@ export function AddReportForm() {
     })();
   }, []);
 
-  // ── Cleanup AbortController saat unmount ─────────────────────────────────
   useEffect(() => {
     return () => {
       abortControllerRef.current?.abort();
@@ -236,7 +187,6 @@ export function AddReportForm() {
 
   const handleCancel = async () => {
     abortControllerRef.current?.abort();
-
     const uploadedUrl = uploadedUrlRef.current;
     if (uploadedUrl) {
       try {
@@ -256,21 +206,27 @@ export function AddReportForm() {
 
   const validateForm = (): boolean => {
     const errs: FormErrors = {};
-
     if (!formData.title.trim() || formData.title.length < 5)
       errs.title = "Judul laporan minimal 5 karakter";
-
     if (formData.description && formData.description.length > 1000)
       errs.description = "Deskripsi tidak boleh lebih dari 1000 karakter";
-
     if (!formData.imageFile) errs.imageFile = "Foto kerusakan wajib diunggah";
     if (!formData.category) errs.category = "Kategori kerusakan wajib dipilih";
+
     if (!formData.kota || !formData.provinsi) {
-      toast.warning("Mohon tunggu hingga lokasi terdeteksi sebelum mengirim.");
-      return false;
+      errs.address = "Lokasi belum terdeteksi sempurna";
+      toast.warning(
+        "Mohon tunggu hingga lokasi terdeteksi, atau pindahkan pin pada peta.",
+      );
     }
 
     setErrors(errs);
+
+    if (Object.keys(errs).length > 0) {
+      // Auto scroll ke error pertama
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     return Object.keys(errs).length === 0;
   };
 
@@ -294,12 +250,22 @@ export function AddReportForm() {
     return json.data!.url;
   };
 
+  const rollbackImage = async (url: string) => {
+    try {
+      await fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      uploadedUrlRef.current = "";
+    } catch (err) {
+      console.error("Gagal rollback gambar:", err);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!validateForm()) {
-      toast.warning("Mohon lengkapi semua data wajib");
-      return;
-    }
+    if (!validateForm()) return;
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -333,9 +299,7 @@ export function AddReportForm() {
       });
 
       if (signal.aborted) return;
-
       setSubmitStep("saving");
-
       const json = await res.json();
 
       if (!res.ok) {
@@ -348,19 +312,12 @@ export function AddReportForm() {
           await rollbackImage(uploadedUrl);
           return;
         }
-
         if (json.errors) {
-          console.error("Detail Error Validasi Backend:", json.errors);
-
-          // Ambil nama kolom pertama yang error beserta pesannya
           const firstErrorField = Object.keys(json.errors)[0];
-          const firstErrorMessage = json.errors[firstErrorField][0];
-
           throw new Error(
-            `Data tidak valid (${firstErrorField}): ${firstErrorMessage}`,
+            `Data tidak valid (${firstErrorField}): ${json.errors[firstErrorField][0]}`,
           );
         }
-
         throw new Error(json.message ?? "Gagal mengirim laporan");
       }
 
@@ -369,14 +326,10 @@ export function AddReportForm() {
       router.push(`/dashboard/reports/${json.data!.id}?submitted=true`);
     } catch (err) {
       if (signal.aborted) return;
-
-      const message =
-        err instanceof Error ? err.message : "Gagal mengirim laporan.";
-      toast.error(message);
-
-      if (uploadedUrlRef.current) {
-        await rollbackImage(uploadedUrlRef.current);
-      }
+      toast.error(
+        err instanceof Error ? err.message : "Gagal mengirim laporan.",
+      );
+      if (uploadedUrlRef.current) await rollbackImage(uploadedUrlRef.current);
     } finally {
       if (!signal.aborted) {
         setSubmitStep(null);
@@ -385,35 +338,32 @@ export function AddReportForm() {
     }
   };
 
-  const rollbackImage = async (url: string) => {
-    try {
-      await fetch("/api/upload", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-      uploadedUrlRef.current = "";
-    } catch (err) {
-      console.error("Gagal rollback gambar:", err);
-    }
-  };
-
   return (
     <>
-      {/* ── Loading Overlay ── */}
       {isSubmitting && submitStep && (
         <SubmitLoadingOverlay
           step={submitStep}
-          onCancel={
-            STEP_CONFIG[submitStep].cancelable ? handleCancel : undefined
-          }
+          onCancel={submitStep !== "saving" ? handleCancel : undefined}
         />
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* ── Foto ── */}
-        <Card>
-          <CardContent className="pt-6">
+      <form onSubmit={handleSubmit} className="space-y-6 pb-24 md:pb-8">
+        {Object.keys(errors).length > 0 && (
+          <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold">Mohon perbaiki isian berikut:</p>
+              <ul className="list-disc pl-4 mt-1 opacity-90">
+                {Object.values(errors).map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        <Card className="border-border shadow-sm">
+          <CardContent className="p-4 md:p-6">
             <ImageUpload
               imagePreview={formData.imagePreview}
               onImageChange={handleImageChange}
@@ -422,9 +372,17 @@ export function AddReportForm() {
           </CardContent>
         </Card>
 
-        {/* ── Info Dasar ── */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
+        <Card className="border-border shadow-sm overflow-hidden">
+          <CardHeader className="bg-muted/30 border-b border-border pb-4">
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              <CardTitle className="text-lg">Detail Laporan</CardTitle>
+            </div>
+            <CardDescription>
+              Ceritakan detail kerusakan jalan yang kamu temukan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-5">
             <FormInput
               label="Judul Laporan"
               placeholder="Contoh: Jalan Berlubang di Depan SMPN 1"
@@ -436,58 +394,57 @@ export function AddReportForm() {
               required
             />
 
+            <FormSelect
+              label="Kategori Kerusakan"
+              value={formData.category}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  category: value as DamageCategory,
+                }))
+              }
+              error={errors.category}
+              required
+              options={[
+                { value: "lubang", label: "Lubang (Pothole)" },
+                { value: "retak", label: "Retak (Cracks)" },
+                { value: "amblas", label: "Amblas (Subsidence)" },
+                { value: "longsor", label: "Longsor (Landslide)" },
+                { value: "bergelombang", label: "Permukaan Bergelombang" },
+                { value: "lainnya", label: "Lainnya" },
+              ]}
+              placeholder="Pilih kategori yang paling sesuai"
+            />
+
             <FormTextarea
-              label="Deskripsi"
-              placeholder="Jelaskan kondisi kerusakan jalan secara detail..."
+              label="Deskripsi Tambahan"
+              placeholder="Jelaskan kondisi kerusakan jalan secara detail (opsional)..."
               value={formData.description || ""}
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, description: value }))
               }
               error={errors.description}
-              required={false}
               rows={4}
             />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormSelect
-                label="Kategori Kerusakan"
-                value={formData.category}
-                onChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    category: value as DamageCategory,
-                  }))
-                }
-                error={errors.category}
-                required
-                options={[
-                  { value: "lubang", label: "Lubang" },
-                  { value: "retak", label: "Retak" },
-                  { value: "amblas", label: "Amblas" },
-                  { value: "longsor", label: "Longsor" },
-                  { value: "bergelombang", label: "Bergelombang" },
-                  { value: "lainnya", label: "Lainnya" },
-                ]}
-                placeholder="Pilih kategori"
-              />
-            </div>
           </CardContent>
         </Card>
 
-        {/* ── Lokasi ── */}
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+        <Card className="border-border shadow-sm overflow-hidden">
+          <CardHeader className="bg-muted/30 border-b border-border pb-4">
+            <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold text-foreground">
-                Lokasi Kerusakan
-              </h3>
+              <CardTitle className="text-lg">Lokasi Kerusakan</CardTitle>
             </div>
-
+            <CardDescription>
+              Ambil lokasi saat ini atau posisikan pin tepat pada titik
+              kerusakan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-4">
             {isLoadingLocation ? (
-              <div className="flex items-center justify-center py-12 text-muted-foreground">
-                <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                <span>Mendeteksi lokasi Anda...</span>
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/20 rounded-lg border border-dashed border-border">
+                <Loader2 className="w-8 h-8 animate-spin mb-3 text-primary" />
+                <span className="font-medium">Mencari lokasi Anda...</span>
               </div>
             ) : (
               <>
@@ -497,22 +454,24 @@ export function AddReportForm() {
                   onLocationChange={handleLocationChange}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                   <FormInput
-                    label="Alamat"
+                    label="Alamat Lengkap"
                     value={formData.address}
                     onChange={(v) => setFormData((p) => ({ ...p, address: v }))}
                     readOnly
-                    placeholder="Otomatis terdeteksi"
+                    placeholder="Alamat akan terisi otomatis"
+                    className="md:col-span-2 opacity-80"
                   />
                   <FormInput
-                    label="Kelurahan"
+                    label="Kelurahan / Desa"
                     value={formData.kelurahan}
                     onChange={(v) =>
                       setFormData((p) => ({ ...p, kelurahan: v }))
                     }
                     readOnly
-                    placeholder="Otomatis terdeteksi"
+                    placeholder="Terisi otomatis"
+                    className="opacity-80"
                   />
                   <FormInput
                     label="Kecamatan"
@@ -521,14 +480,16 @@ export function AddReportForm() {
                       setFormData((p) => ({ ...p, kecamatan: v }))
                     }
                     readOnly
-                    placeholder="Otomatis terdeteksi"
+                    placeholder="Terisi otomatis"
+                    className="opacity-80"
                   />
                   <FormInput
                     label="Kota/Kabupaten"
                     value={formData.kota}
                     onChange={(v) => setFormData((p) => ({ ...p, kota: v }))}
                     readOnly
-                    placeholder="Otomatis terdeteksi"
+                    placeholder="Terisi otomatis"
+                    className="opacity-80"
                   />
                   <FormInput
                     label="Provinsi"
@@ -537,8 +498,8 @@ export function AddReportForm() {
                       setFormData((p) => ({ ...p, provinsi: v }))
                     }
                     readOnly
-                    placeholder="Otomatis terdeteksi"
-                    className="md:col-span-2"
+                    placeholder="Terisi otomatis"
+                    className="opacity-80"
                   />
                 </div>
               </>
@@ -546,13 +507,13 @@ export function AddReportForm() {
           </CardContent>
         </Card>
 
-        {/* ── Tombol ── */}
-        <div className="flex gap-3 pt-4">
+        {/* ── Sticky Action Buttons (UI/UX Improvement) ── */}
+        <div className="mt-5 flex gap-3 ">
           <Button
             type="button"
             variant="outline"
             onClick={() => router.back()}
-            className="flex-1 md:flex-none md:px-8"
+            className="flex-1 md:flex-none md:w-32 rounded-xl"
             disabled={isSubmitting}
           >
             Batal
@@ -560,7 +521,7 @@ export function AddReportForm() {
           <Button
             type="submit"
             disabled={isSubmitting || isLoadingLocation}
-            className="flex-1 md:flex-none md:px-8"
+            className="flex-2 md:flex-none md:w-48 rounded-xl shadow-lg shadow-primary/20"
           >
             {isSubmitting ? (
               <>
@@ -577,72 +538,5 @@ export function AddReportForm() {
         </div>
       </form>
     </>
-  );
-}
-
-// ── Loading Overlay Component ─────────────────────────────────────────────────
-interface SubmitLoadingOverlayProps {
-  step: Exclude<SubmitStep, null>;
-  onCancel?: () => void;
-}
-
-function SubmitLoadingOverlay({ step, onCancel }: SubmitLoadingOverlayProps) {
-  const config = STEP_CONFIG[step];
-  const steps = ["uploading", "analyzing", "saving"] as const;
-  const currentIndex = steps.indexOf(step);
-
-  return (
-    <div className="fixed inset-0 z-1100 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-sm mx-4 bg-background border border-border rounded-2xl shadow-2xl p-6 flex flex-col items-center gap-5">
-        {/* Animated icon */}
-        <div className="relative flex items-center justify-center">
-          {/* Outer pulse ring */}
-          <span className="absolute w-16 h-16 rounded-full bg-primary/15 animate-ping" />
-          {/* Inner circle */}
-          <span className="relative flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 border border-primary/20 text-primary">
-            {config.icon}
-          </span>
-        </div>
-
-        {/* Label */}
-        <div className="text-center space-y-1">
-          <p className="text-sm font-semibold text-foreground">
-            {config.label}
-          </p>
-          <p className="text-xs text-muted-foreground">{config.sublabel}</p>
-        </div>
-
-        {/* Step progress dots */}
-        <div className="flex items-center gap-2">
-          {steps.map((s, i) => (
-            <div
-              key={s}
-              className={[
-                "rounded-full transition-all duration-300",
-                i < currentIndex
-                  ? "w-2 h-2 bg-primary"
-                  : i === currentIndex
-                    ? "w-3 h-3 bg-primary animate-pulse"
-                    : "w-2 h-2 bg-muted-foreground/30",
-              ].join(" ")}
-            />
-          ))}
-        </div>
-
-        {/* Cancel button */}
-        {onCancel && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onCancel}
-            className="gap-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/8 h-8 px-3"
-          >
-            <X className="w-3.5 h-3.5" />
-            Batalkan
-          </Button>
-        )}
-      </div>
-    </div>
   );
 }
