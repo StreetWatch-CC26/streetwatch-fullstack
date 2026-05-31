@@ -1,7 +1,6 @@
 // src/components/reports/ReportPost.tsx
 "use client";
 
-import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
@@ -26,25 +25,26 @@ interface ReportPostProps {
 
 export function ReportPost({ report }: ReportPostProps) {
   const router = useRouter();
-  const upvotes = useUpvotes();
 
   const timeAgo = formatDistanceToNow(new Date(report.createdAt), {
     addSuffix: true,
     locale: idLocale,
   });
 
-  useEffect(() => {
-    const userHasVoted = report.upvotes && report.upvotes.length > 0;
-    upvotes.sync(report.id, report.upvoteCount, !!userHasVoted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [report.id]);
+  const initialVoted = !!(report.upvotes && report.upvotes.length > 0);
+  const initialCount = report.upvoteCount || 0;
+  const upvotes = useUpvotes({
+    [report.id]: {
+      count: initialCount,
+      hasVoted: initialVoted,
+    },
+  });
 
   const currentUpvoteCount = upvotes.getCount(report.id);
   const hasVoted = upvotes.hasVoted(report.id);
 
   return (
-    // Penyesuaian: border-b untuk mobile (krn gap-0), border utuh di layar besar, h-full agar rapi di grid
-    <article className="bg-card border-b sm:border border-border sm:rounded-xl overflow-hidden flex flex-col shadow-sm h-full">
+    <article className="bg-card border-b border border-border sm:rounded-xl overflow-hidden flex flex-col shadow-sm h-full">
       {/* ── Header Post ── */}
       <div className="flex items-center justify-between p-3 sm:p-4">
         <div className="flex items-center gap-3">
