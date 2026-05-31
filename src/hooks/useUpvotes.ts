@@ -3,63 +3,50 @@
 import { useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
-export function useUpvotes() {
-  const [counts, setCounts] = useState<Record<string, number>>({});
-  const [voted, setVoted] = useState<Set<string>>(new Set());
+interface UpvoteState {
+  count: number;
+  hasVoted: boolean;
+}
 
+export function useUpvotes(initialState: Record<string, UpvoteState> = {}) {
+  const [upvoteData, setUpvoteData] =
+    useState<Record<string, UpvoteState>>(initialState);
   const pendingReqs = useRef<Set<string>>(new Set());
 
   const sync = useCallback((id: string, count: number, hasVoted: boolean) => {
-    setCounts((prev) => ({ ...prev, [id]: count }));
-    setVoted((prev) => {
-      const next = new Set(prev);
-      if (hasVoted) {
-        next.add(id);
-      } else {
-        next.delete(id);
-      }
-      return next;
-    });
+    setUpvoteData((prev) => ({
+      ...prev,
+      [id]: { count, hasVoted },
+    }));
   }, []);
 
   const toggle = useCallback(async (reportId: string) => {
-    // 1. BLOKIR JIKA SEDANG PROSES (Anti Spam)
     if (pendingReqs.current.has(reportId)) return;
-
-    // Kunci laporan ini
     pendingReqs.current.add(reportId);
 
-    let previousCount = 0;
-    let wasVoted = false;
+    let previousState: UpvoteState | undefined;
 
-    // 2. Optimistic Update
-    setVoted((prev) => {
-      const next = new Set(prev);
-      wasVoted = next.has(reportId);
+    setUpvoteData((prev) => {
+      previousState = prev[reportId];
+      const currentCount = previousState?.count ?? 0;
+      const currentVoted = previousState?.hasVoted ?? false;
 
-      // PERBAIKAN LINTER: Gunakan if-else
-      if (wasVoted) {
-        next.delete(reportId);
-      } else {
-        next.add(reportId);
-      }
-
-      return next;
+      return {
+        ...prev,
+        [reportId]: {
+          hasVoted: !currentVoted,
+          count: currentVoted ? currentCount - 1 : currentCount + 1,
+        },
+      };
     });
 
-    setCounts((prev) => {
-      previousCount = prev[reportId] ?? 0;
-      const delta = wasVoted ? -1 : 1;
-      return { ...prev, [reportId]: previousCount + delta };
-    });
-
-    // 3. API Call ke Backend
     try {
       const res = await fetch(`/api/reports/${reportId}/upvote`, {
         method: "POST",
       });
-      let json;
       const textResponse = await res.text();
+
+      let json;
       try {
         json = JSON.parse(textResponse);
       } catch {
@@ -68,40 +55,34 @@ export function useUpvotes() {
 
       if (!res.ok) throw new Error(json.message || "Gagal memproses dukungan");
 
-      // 4. Sync ulang dengan data valid dari server
-      setCounts((prev) => ({ ...prev, [reportId]: json.data.upvoteCount }));
-      setVoted((prev) => {
-        const next = new Set(prev);
-        if (json.data.upvoted) {
-          next.add(reportId);
-        } else {
-          next.delete(reportId);
-        }
-        return next;
-      });
+      setUpvoteData((prev) => ({
+        ...prev,
+        [reportId]: {
+          count: json.data.upvoteCount,
+          hasVoted: json.data.upvoted,
+        },
+      }));
     } catch (err) {
-      // 5. Rollback jika gagal
-      setVoted((prev) => {
-        const next = new Set(prev);
-        if (wasVoted) {
-          next.add(reportId);
-        } else {
-          next.delete(reportId);
-        }
-        return next;
-      });
-      setCounts((prev) => ({ ...prev, [reportId]: previousCount }));
+      setUpvoteData((prev) => ({
+        ...prev,
+        [reportId]: previousState || { count: 0, hasVoted: false },
+      }));
 
       console.error("[Upvote Error]:", err);
       toast.error("Gagal memproses dukungan. Pastikan kamu sudah login.");
     } finally {
-      // 6. BUKA KUNCI
       pendingReqs.current.delete(reportId);
     }
   }, []);
 
-  const hasVoted = useCallback((id: string) => voted.has(id), [voted]);
-  const getCount = useCallback((id: string) => counts[id] ?? 0, [counts]);
+  const hasVoted = useCallback(
+    (id: string) => upvoteData[id]?.hasVoted ?? false,
+    [upvoteData],
+  );
+  const getCount = useCallback(
+    (id: string) => upvoteData[id]?.count ?? 0,
+    [upvoteData],
+  );
 
   return { toggle, hasVoted, getCount, sync };
 }
