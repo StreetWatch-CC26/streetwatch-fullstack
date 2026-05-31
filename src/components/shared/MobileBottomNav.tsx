@@ -29,7 +29,7 @@ import {
 
 // Navigasi Utama (Bottom Bar)
 const mainNavItems = [
-  { title: "Beranda", url: "/dashboard/report", icon: RiHome6Fill },
+  { title: "Beranda", url: "/dashboard/reports", icon: RiHome6Fill },
   { title: "Peta", url: "/dashboard/map", icon: RiCompassDiscoverFill },
   {
     title: "Lapor",
