@@ -20,9 +20,13 @@ import {
   serviceUnavailable,
 } from "@/lib/api-response";
 
-// GET /api/reports — Mengambil daftar laporan (bisa diakses publik)
+// GET /api/reports — Mengambil daftar laporan
 export async function GET(req: NextRequest) {
   try {
+    // 1. Ambil session untuk mengetahui siapa yang sedang login (opsional)
+    const session = await auth();
+    const userId = session?.user?.id;
+
     const { searchParams } = req.nextUrl;
     const queryParams = Object.fromEntries(searchParams.entries());
 
@@ -36,11 +40,11 @@ export async function GET(req: NextRequest) {
 
     const { page, limit, sort, ...filters } = query.data;
 
-    const { data, total } = await reportService.getAll(filters, {
-      page,
-      limit,
-      sort,
-    });
+    const { data, total } = await reportService.getAll(
+      filters,
+      { page, limit, sort },
+      userId,
+    );
 
     const totalPages = Math.ceil(total / limit);
     return ok(data, {

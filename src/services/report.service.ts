@@ -9,8 +9,12 @@ import type {
 import { CreateReportInput } from "@/validations/report.validation";
 
 export const reportService = {
-  async getAll(filters: ReportFilters, pagination: PaginationOptions) {
-    return reportRepository.findMany(filters, pagination);
+  async getAll(
+    filters: ReportFilters,
+    pagination: PaginationOptions,
+    userId?: string,
+  ) {
+    return reportRepository.findMany(filters, pagination, userId);
   },
 
   async getForMap(

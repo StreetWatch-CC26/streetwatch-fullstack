@@ -81,7 +81,11 @@ function buildWhere(filters: ReportFilters): Prisma.ReportWhereInput {
 }
 
 export const reportRepository = {
-  async findMany(filters: ReportFilters, pagination: PaginationOptions) {
+  async findMany(
+    filters: ReportFilters,
+    pagination: PaginationOptions,
+    userId?: string,
+  ) {
     const where = buildWhere(filters);
     const currentPage = Math.max(1, pagination.page);
     const skip = (currentPage - 1) * pagination.limit;
@@ -95,6 +99,16 @@ export const reportRepository = {
         include: {
           author: { select: { id: true, name: true, image: true } },
           _count: { select: { upvotes: true } },
+          upvotes: userId
+            ? {
+                where: {
+                  userId: userId,
+                },
+                select: {
+                  userId: true,
+                },
+              }
+            : false,
         },
       }),
       prisma.report.count({ where }),
