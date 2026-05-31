@@ -6,18 +6,11 @@ import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
-import { Badge } from "@/components/ui/badge";
-import {
-  MapPin,
-  Image as ImageIcon,
-  User,
-  AlertCircle,
-  ThumbsUp,
-} from "lucide-react";
+import { MapPin, Image as ImageIcon, User, ThumbsUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { STATUS_COLOR } from "@/lib/constants";
 import { useUpvotes } from "@/hooks/useUpvotes";
 import type { ReportItem } from "@/types/report";
+import { URGENCY_COLOR, URGENCY_LABEL } from "@/lib/constants";
 
 interface ReportPostProps {
   report: ReportItem;
@@ -34,126 +27,122 @@ export function ReportPost({ report }: ReportPostProps) {
   const initialVoted = !!(report.upvotes && report.upvotes.length > 0);
   const initialCount = report.upvoteCount || 0;
   const upvotes = useUpvotes({
-    [report.id]: {
-      count: initialCount,
-      hasVoted: initialVoted,
-    },
+    [report.id]: { count: initialCount, hasVoted: initialVoted },
   });
 
   const currentUpvoteCount = upvotes.getCount(report.id);
   const hasVoted = upvotes.hasVoted(report.id);
 
   return (
-    <article className="bg-card border-b border border-border sm:rounded-xl overflow-hidden flex flex-col shadow-sm h-full">
-      {/* ── Header Post ── */}
-      <div className="flex items-center justify-between p-3 sm:p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center border border-border shrink-0 overflow-hidden">
-            {report.author?.image ? (
-              <Image
-                src={report.author.image}
-                alt="Avatar"
-                className="w-full h-full object-cover"
-                width={32}
-                height={32}
-              />
-            ) : (
-              <User className="w-4 h-4 text-muted-foreground" />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-foreground leading-tight line-clamp-1">
-              {report.author?.name || "Warga Anonim"}
-            </span>
-            <span className="text-[11px] text-muted-foreground mt-0.5">
-              {timeAgo}
-            </span>
-          </div>
-        </div>
-        <Badge
-          variant="secondary"
-          className={cn(
-            "text-[10px] px-2 py-0.5 border-none shrink-0 ml-2",
-            STATUS_COLOR[report.status] || "bg-muted text-muted-foreground",
-          )}
-        >
-          {report.status.replace("_", " ").toUpperCase()}
-        </Badge>
-      </div>
-
-      {/* ── Gambar Post ── */}
+    <article className="bg-card border border-border rounded-xl overflow-hidden flex flex-col shadow-sm h-full group">
+      {/* ── Image — free ratio on mobile, fixed 4:3 on sm+ grid ── */}
       <div
-        className="relative w-full aspect-square bg-muted cursor-pointer"
+        className="relative w-full cursor-pointer overflow-hidden bg-muted"
         onClick={() => router.push(`/dashboard/reports/${report.id}`)}
       >
         {report.imageUrl ? (
-          <Image
-            src={report.imageUrl}
-            alt={report.title}
-            fill
-            className="object-cover transition-transform duration-300 hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            loading="eager"
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/40 gap-2">
-            <ImageIcon className="w-12 h-12" />
-            <span className="text-sm font-medium">
-              Tidak ada foto terlampir
-            </span>
+          <div className="relative w-full sm:aspect-4/3 max-sm:min-h-40">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={report.imageUrl}
+              alt={report.title}
+              className="w-full h-auto sm:absolute sm:inset-0 sm:h-full object-contain sm:object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+              loading="lazy"
+            />
           </div>
-        )}
-
-        {report.urgency === "high" && (
-          <div className="absolute top-3 right-3 bg-destructive text-destructive-foreground p-1.5 rounded-full shadow-lg animate-pulse">
-            <AlertCircle className="w-4 h-4" />
+        ) : (
+          <div className="w-full aspect-4/3 flex flex-col items-center justify-center text-muted-foreground/30 gap-2">
+            <ImageIcon className="w-10 h-10" />
+            <span className="text-xs font-medium">Tidak ada foto</span>
           </div>
         )}
       </div>
 
-      {/* ── Footer / Actions & Content ── */}
-      <div className="p-3 sm:p-4 flex flex-col grow space-y-3">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => upvotes.toggle(report.id)}
+      {/* ── Card body ── */}
+      <div className="flex flex-col grow p-3 sm:p-4 gap-3">
+        {/* Author row */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center border border-border shrink-0 overflow-hidden">
+              {report.author?.image ? (
+                <Image
+                  src={report.author.image}
+                  alt="Avatar"
+                  width={28}
+                  height={28}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-3.5 h-3.5 text-muted-foreground" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-foreground leading-tight truncate">
+                {report.author?.name || "Warga Anonim"}
+              </p>
+              <p className="text-[10px] text-muted-foreground">{timeAgo}</p>
+            </div>
+          </div>
+
+          {/* Urgency chip */}
+          <span
             className={cn(
-              "flex items-center gap-1.5 group transition-colors",
-              hasVoted ? "text-primary" : "text-foreground hover:text-primary",
+              "shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full border",
+              URGENCY_COLOR[report.urgency] ?? URGENCY_COLOR.low,
+            )}
+          >
+            Kerusakan {URGENCY_LABEL[report.urgency] ?? report.urgency}
+          </span>
+        </div>
+
+        {/* Title + description */}
+        <div
+          className="grow cursor-pointer"
+          onClick={() => router.push(`/dashboard/reports/${report.id}`)}
+        >
+          <p className="text-sm font-bold text-foreground leading-snug mb-1 line-clamp-2">
+            {report.title}
+          </p>
+          <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+            {report.description || "Tidak ada deskripsi."}
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-2.5 border-t border-border/50 gap-2">
+          {/* Location */}
+          <div className="flex items-center gap-1 text-[11px] text-primary font-medium min-w-0">
+            <MapPin className="w-3 h-3 shrink-0" />
+            <span className="truncate">{report.kota}</span>
+            <span className="text-muted-foreground shrink-0">
+              · #{report.category}
+            </span>
+          </div>
+
+          {/* Upvote */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              upvotes.toggle(report.id);
+            }}
+            aria-label={`Dukung laporan. ${currentUpvoteCount} dukungan`}
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition-all duration-200 shrink-0",
+              hasVoted
+                ? "bg-primary/10 border-primary/30 text-primary"
+                : "border-border/60 text-muted-foreground hover:text-primary hover:border-primary/30",
             )}
           >
             <ThumbsUp
               className={cn(
-                "w-6 h-6 transition-all",
+                "w-3.5 h-3.5 transition-all",
                 hasVoted && "fill-current",
               )}
             />
-            <span className="text-sm font-bold">{currentUpvoteCount}</span>
-          </button>
-        </div>
-
-        <div className="grow">
-          <p className="text-sm text-foreground">
-            <span className="font-semibold mr-2">{report.title}</span>
-            <span className="text-xs text-muted-foreground line-clamp-5 mt-1">
-              {report.description || "Tidak ada deskripsi yang diberikan."}
+            <span className="text-xs font-bold tabular-nums">
+              {currentUpvoteCount}
             </span>
-          </p>
-          <button
-            onClick={() => router.push(`/dashboard/reports/${report.id}`)}
-            className="text-xs text-muted-foreground mt-1 hover:text-primary transition-colors"
-          >
-            Lihat detail selengkapnya...
           </button>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/40 mt-auto">
-          <div className="flex items-center gap-1 text-[11px] font-medium text-primary bg-primary/10 px-2 py-1 rounded-md max-w-[70%]">
-            <MapPin className="w-3 h-3 shrink-0" />
-            <span className="line-clamp-1">{report.kota}</span>
-          </div>
-          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest shrink-0">
-            #{report.category}
-          </span>
         </div>
       </div>
     </article>
