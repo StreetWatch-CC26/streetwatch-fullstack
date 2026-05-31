@@ -6,7 +6,7 @@ import { AnalyticsSection } from "@/components/overview/AnalyticsSection";
 export default function DashboardPage() {
   return (
     <div className="px-4 py-6 max-w-6xl mx-auto space-y-8">
-      <div>
+      <div className="sr-only sm:not-sr-only">
         <h1 className="font-heading text-2xl font-bold text-foreground">
           Overview Analytics
         </h1>
