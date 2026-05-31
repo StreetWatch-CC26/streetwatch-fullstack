@@ -26,7 +26,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import ThemeToggle from "./ThemeToggle";
 
 // Navigasi Utama (Bottom Bar)
 const mainNavItems = [
@@ -194,7 +193,6 @@ export function MobileBottomNav() {
                   Akses fitur lainnya seperti laporan saya, pengaturan akun, dan
                   lainnya.
                 </DrawerDescription>
-                <ThemeToggle className="absolute top-4 right-4" />
               </DrawerHeader>
 
               <div className="space-y-6">
