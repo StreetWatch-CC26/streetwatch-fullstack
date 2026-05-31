@@ -14,6 +14,12 @@ export const URGENCY_COLOR: Record<string, string> = {
   low: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
 };
 
+export const URGENCY_HEX: Record<Urgency, string> = {
+  high: "#ef4444",
+  medium: "#eab308",
+  low: "#22c55e",
+};
+
 export const STATUS_LABEL: Record<string, string> = {
   verified: "Terverifikasi",
   fail: "Analisis Gagal",
