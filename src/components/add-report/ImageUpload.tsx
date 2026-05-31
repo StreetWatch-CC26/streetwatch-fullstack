@@ -21,19 +21,14 @@ export function ImageUpload({
 
   const handleFileSelect = (file: File | null) => {
     if (!file) return;
-
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       alert("File harus berupa gambar");
       return;
     }
-
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       alert("Ukuran file maksimal 10MB");
       return;
     }
-
     onImageChange(file);
   };
 
@@ -41,38 +36,34 @@ export function ImageUpload({
     e.preventDefault();
     setIsDragging(true);
   };
-
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
-
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-
     const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileSelect(files[0]);
-    }
+    if (files.length > 0) handleFileSelect(files[0]);
   };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      handleFileSelect(files[0]);
-    }
+    if (files && files.length > 0) handleFileSelect(files[0]);
   };
-
   const handleRemove = () => {
     onImageChange(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
-
-  const openFileDialog = () => {
-    fileInputRef.current?.click();
+  const openFileDialog = () => fileInputRef.current?.click();
+  const openGallery = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files && files.length > 0) handleFileSelect(files[0]);
+    };
+    input.click();
   };
 
   return (
@@ -85,132 +76,156 @@ export function ImageUpload({
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleInputChange}
         className="hidden"
-        // Enable camera on mobile devices
-        capture="environment"
       />
 
       {imagePreview ? (
-        // Image Preview
-        <div className="relative group">
-          <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-border bg-muted">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/30">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imagePreview}
+            alt="Preview foto kerusakan"
+            className="w-full h-auto max-h-[70vh] object-contain"
+          />
 
-          {/* Overlay on hover */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+          {/* Hover overlay with actions */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-200 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
             <button
               type="button"
               onClick={openFileDialog}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background/90 border border-border text-xs font-medium text-foreground hover:bg-background transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-background/95 border border-border text-xs font-semibold text-foreground hover:bg-background transition-colors shadow-lg"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Ganti Foto
+              <RefreshCw className="w-3.5 h-3.5" />
+              Ganti Foto
             </button>
             <button
               type="button"
               onClick={handleRemove}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background/90 border border-border text-xs font-medium text-destructive hover:bg-background transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-background/95 border border-destructive/30 text-xs font-semibold text-destructive hover:bg-destructive/5 transition-colors shadow-lg"
             >
-              <X className="w-3.5 h-3.5" /> Hapus
+              <X className="w-3.5 h-3.5" />
+              Hapus
+            </button>
+          </div>
+
+          {/* Mobile: always-visible bottom bar (no hover state on touch) */}
+          <div className="sm:hidden absolute bottom-0 left-0 right-0 flex gap-2 p-2 bg-linear-to-t from-black/70 to-transparent">
+            <button
+              type="button"
+              onClick={openFileDialog}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-background/90 text-xs font-semibold text-foreground"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Ganti
+            </button>
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-destructive/90 text-xs font-semibold text-destructive-foreground"
+            >
+              <X className="w-3.5 h-3.5" />
+              Hapus
             </button>
           </div>
         </div>
       ) : (
-        // Upload Area
+        /* ── Upload dropzone ── */
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={cn(
-            "relative aspect-video w-full min-h-65 border-2 border-dashed rounded-lg transition-all cursor-pointer",
-            isDragging
-              ? "border-primary bg-primary/5 scale-[1.02]"
-              : "border-border hover:border-primary/50 hover:bg-accent/50",
-            error && "border-destructive",
-          )}
           onClick={openFileDialog}
+          className={cn(
+            "relative w-full border-2 border-dashed rounded-xl transition-all cursor-pointer",
+            "py-10 px-6",
+            isDragging
+              ? "border-primary bg-primary/5 scale-[1.01]"
+              : "border-border hover:border-primary/50 hover:bg-accent/30",
+            error && "border-destructive bg-destructive/5",
+          )}
         >
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-            <div className="p-4 rounded-full bg-primary/10 mb-1 sm:mb-4">
-              <ImageIcon className="w-6 sm:w-8 h-6 sm:h-8 text-primary" />
+          <div className="flex flex-col items-center text-center gap-3">
+            <div
+              className={cn(
+                "w-14 h-14 rounded-2xl flex items-center justify-center transition-colors",
+                isDragging ? "bg-primary/20" : "bg-muted",
+              )}
+            >
+              <ImageIcon
+                className={cn(
+                  "w-7 h-7",
+                  isDragging ? "text-primary" : "text-muted-foreground",
+                )}
+              />
             </div>
 
-            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
-              Unggah Foto Kerusakan
-            </h3>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {isDragging ? "Lepaskan foto di sini" : "Unggah Foto Kerusakan"}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Drag & drop, atau klik untuk memilih
+              </p>
+            </div>
 
-            <p className="text-xs text-muted-foreground mb-4 max-w-sm">
-              Drag & drop foto di sini, atau klik untuk memilih file
-            </p>
+            {/* Desktop button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                openFileDialog();
+              }}
+              className="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              <Upload className="w-4 h-4" />
+              Pilih File
+            </button>
 
-            <div className="flex flex-wrap gap-3 justify-center">
-              {/* Desktop: Upload button */}
+            {/* Mobile: two buttons — camera and gallery */}
+            <div className="flex gap-2 md:hidden w-full max-w-xs">
               <button
                 type="button"
-                className="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   openFileDialog();
                 }}
-              >
-                <Upload className="w-4 h-4" />
-                Pilih File
-              </button>
-
-              {/* Mobile: Camera & Gallery buttons */}
-              <button
-                type="button"
-                className="md:hidden inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openFileDialog();
-                }}
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
               >
                 <Camera className="w-4 h-4" />
-                Ambil Foto
+                Kamera
               </button>
-
               <button
                 type="button"
-                className="md:hidden inline-flex items-center gap-2 px-4 py-2 bg-primary text-secondary rounded-lg font-medium hover:bg-primary/90 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Create a new input without capture attribute for gallery
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = "image/*";
-                  input.onchange = (e) => {
-                    const files = (e.target as HTMLInputElement).files;
-                    if (files && files.length > 0) {
-                      handleFileSelect(files[0]);
-                    }
-                  };
-                  input.click();
+                  openGallery();
                 }}
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 bg-secondary text-secondary-foreground border border-border rounded-lg text-sm font-medium hover:bg-secondary/80 transition-colors"
               >
                 <Upload className="w-4 h-4" />
-                Pilih dari Galeri
+                Galeri
               </button>
             </div>
 
-            <p className="text-xs text-muted-foreground mt-4">
-              Format: JPG, PNG, WEBP • Maksimal 10MB
+            <p className="text-[11px] text-muted-foreground">
+              JPG, PNG, WEBP · Maksimal 10MB
             </p>
           </div>
         </div>
       )}
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && (
+        <p className="text-xs text-destructive flex items-center gap-1">
+          <span className="w-1 h-1 rounded-full bg-destructive shrink-0" />
+          {error}
+        </p>
+      )}
 
-      <p className="text-xs text-muted-foreground align-middle mb-3">
-        <RiLightbulbFill className="inline w-4 h-4 text-yellow-500 mr-1 items-center" />
-        Foto akan dikompres otomatis
+      <p className="text-xs text-muted-foreground flex items-center gap-1">
+        <RiLightbulbFill className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+        Foto akan dikompres otomatis sebelum dikirim
       </p>
     </div>
   );
