@@ -112,7 +112,7 @@ export default function MapPage() {
 
         if (json.success && isActive) {
           const d = json.data;
-          (d as Report & { imageUrl?: string | "" }).imageUrl =
+          (d as Report & { imageUrl?: string }).imageUrl =
             d.imageUrls?.[0] ?? null;
           setSelectedDetail(d);
           upvotes.sync(d.id, d.upvoteCount, Boolean(d.upvotes?.length));
