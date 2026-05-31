@@ -1,20 +1,8 @@
 "use client";
-/**
- * app/dashboard/peta/page.tsx
- *
- * Halaman Peta Sebaran — menggunakan:
- *   - useWilayahFilter  → filter 2 level + mapCenter bundled
- *   - useUrgencyFilter  → filter berdasarkan urgency
- *   - useUpvotes        → toggle dukungan laporan
- *   - WilayahFilterBar  → UI filter provinsi + kab/kota
- *   - UrgencyFilterBar  → UI filter chip berdasarkan tingkat kerusakan
- *   - LeafletMap        → peta + marker cluster (lazy, no SSR)
- *   - ReportPanel       → detail laporan (bottom sheet / card)
- *   - MapLegend         → keterangan warna urgensi
- */
 
 import dynamic from "next/dynamic";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { toast } from "sonner";
 
 import { useWilayahFilter, type WilayahItem } from "@/hooks/useWilayahFilter";
 import { useUrgencyFilter } from "@/hooks/useUrgencyFilter";
@@ -36,7 +24,6 @@ interface MapReport {
   upvotes?: { id: string }[];
 }
 
-// Leaflet tidak boleh di-SSR
 const LeafletMap = dynamic(() => import("@/components/map/LeafletMap"), {
   ssr: false,
   loading: () => (
@@ -53,12 +40,10 @@ export default function MapPage() {
 
   const [reports, setReports] = useState<MapReport[]>([]);
   const [isLoadingMap, setIsLoadingMap] = useState(true);
-
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedDetail, setSelectedDetail] = useState<Report | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
-  // ── Urgency filter (counts dihitung dari `reports` sebelum filter urgensi) ──
   const {
     activeFilters,
     filteredReports,
@@ -66,38 +51,44 @@ export default function MapPage() {
     setFilter: setUrgencyFilter,
   } = useUrgencyFilter(reports);
 
-  // ── 1. Fetch data marker peta ────────────────────────────────────────────────
-  useEffect(() => {
-    async function loadMapData() {
-      setIsLoadingMap(true);
-      try {
-        const params = new URLSearchParams();
-        if (filter.selectedProvinsi)
-          params.append("provinsi", filter.selectedProvinsi.nama);
-        if (filter.selectedKabupaten)
-          params.append("kota", filter.selectedKabupaten.nama);
+  const loadMapData = useCallback(async () => {
+    setIsLoadingMap(true);
+    try {
+      const params = new URLSearchParams();
+      if (filter.selectedProvinsi)
+        params.append("provinsi", filter.selectedProvinsi.nama);
+      if (filter.selectedKabupaten)
+        params.append("kota", filter.selectedKabupaten.nama);
 
-        const res = await fetch(`/api/reports/map?${params.toString()}`);
-        const json = await res.json();
+      const res = await fetch(`/api/reports/map?${params.toString()}`);
+      const json = (await res.json()) as {
+        success: boolean;
+        data: MapReport[];
+      };
 
-        if (json.success) {
-          setReports(json.data);
-          json.data.forEach((r: MapReport) => {
-            const hasVoted = Boolean(r.upvotes && r.upvotes.length > 0);
-            upvotes.sync(r.id, r.upvoteCount, hasVoted);
-          });
-        }
-      } catch (err) {
-        console.error("Gagal memuat data peta", err);
-      } finally {
-        setIsLoadingMap(false);
+      if (json.success) {
+        setReports(json.data);
+        json.data.forEach((r) => {
+          upvotes.sync(r.id, r.upvoteCount, Boolean(r.upvotes?.length));
+        });
       }
+    } catch (err) {
+      console.error("Gagal memuat data peta", err);
+      toast.error("Gagal memuat data peta. Coba lagi.");
+    } finally {
+      setIsLoadingMap(false);
     }
-    loadMapData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter.selectedProvinsi, filter.selectedKabupaten]);
 
-  // ── 2. Fetch detail laporan saat marker diklik ───────────────────────────────
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadMapData();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [loadMapData]);
+
   useEffect(() => {
     let isActive = true;
 
@@ -110,41 +101,36 @@ export default function MapPage() {
       };
     }
 
-    async function loadReportDetail() {
+    async function loadDetail() {
       setIsLoadingDetail(true);
       try {
         const res = await fetch(`/api/reports/${selectedId}`);
-        const json = await res.json();
+        const json = (await res.json()) as {
+          success: boolean;
+          data: Report & { imageUrls?: string[]; upvotes?: { id: string }[] };
+        };
 
         if (json.success && isActive) {
-          const detailData = json.data;
-          detailData.imageUrl = detailData.imageUrls?.[0] || null;
-          setSelectedDetail(detailData);
-
-          const userHasVoted = Boolean(
-            detailData.upvotes && detailData.upvotes.length > 0,
-          );
-          upvotes.sync(detailData.id, detailData.upvoteCount, userHasVoted);
+          const d = json.data;
+          (d as Report & { imageUrl?: string | "" }).imageUrl =
+            d.imageUrls?.[0] ?? null;
+          setSelectedDetail(d);
+          upvotes.sync(d.id, d.upvoteCount, Boolean(d.upvotes?.length));
         }
       } catch (err) {
-        if (isActive) {
-          console.error("Gagal memuat detail laporan", err);
-        }
+        if (isActive) console.error("Gagal memuat detail laporan", err);
       } finally {
-        if (isActive) {
-          setIsLoadingDetail(false);
-        }
+        if (isActive) setIsLoadingDetail(false);
       }
     }
 
-    loadReportDetail();
+    void loadDetail();
     return () => {
       isActive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
-  // ── Reset panel + urgency filter saat ganti wilayah ─────────────────────────
   const filterWithClear = useMemo(
     () => ({
       ...filter,
@@ -167,9 +153,17 @@ export default function MapPage() {
     [filter, setUrgencyFilter],
   );
 
-  function handleVote(id: string) {
-    upvotes.toggle(id);
-  }
+  const prevFilteredCountRef = useRef(filteredReports.length);
+  useEffect(() => {
+    const prev = prevFilteredCountRef.current;
+    prevFilteredCountRef.current = filteredReports.length;
+
+    if (filteredReports.length === 0 && prev > 0 && activeFilters.size > 0) {
+      toast.info("Tidak ada laporan untuk tingkat kerusakan yang dipilih.", {
+        duration: 3000,
+      });
+    }
+  }, [filteredReports.length, activeFilters.size]);
 
   const hasFilter = !!(filter.selectedProvinsi || filter.selectedKabupaten);
 
@@ -179,7 +173,6 @@ export default function MapPage() {
       <div className="flex flex-col gap-1 px-2 pt-1.5 pb-1.5 border-b border-border shrink-0">
         <WilayahFilterBar filter={filterWithClear} />
 
-        {/* Urgency filter chips */}
         <UrgencyFilterBar
           activeFilters={activeFilters}
           counts={counts}
@@ -187,16 +180,13 @@ export default function MapPage() {
           className="my-1"
         />
 
-        {/* Stats */}
         <div className="flex items-center justify-between gap-2 min-w-0">
-          <div className="flex items-center gap-2.5 text-[10px] text-muted-foreground">
-            <span>
-              <span className="font-semibold text-foreground tabular-nums">
-                {filteredReports.length}
-              </span>{" "}
-              laporan kerusakan jalan ditemukan.
-            </span>
-          </div>
+          <p className="text-[10px] text-muted-foreground">
+            <span className="font-semibold text-foreground tabular-nums">
+              {filteredReports.length}
+            </span>{" "}
+            laporan kerusakan jalan ditemukan.
+          </p>
 
           {hasFilter && (
             <p className="text-[10px] text-muted-foreground truncate text-right min-w-0">
@@ -232,18 +222,16 @@ export default function MapPage() {
               <MapLegend />
             </div>
 
-            {filteredReports.length === 0 && (
+            {filteredReports.length === 0 && activeFilters.size === 0 && (
               <div className="absolute inset-0 z-410 flex items-center justify-center pointer-events-none">
                 <div className="bg-background/90 backdrop-blur-md border border-border rounded-2xl px-6 py-4 text-center shadow-lg">
                   <p className="text-sm font-semibold text-foreground">
                     Tidak ada laporan
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {activeFilters.size > 0
-                      ? "Tidak ada laporan untuk tingkat kerusakan yang dipilih."
-                      : hasFilter
-                        ? "Belum ada jalan rusak yang diverifikasi di wilayah ini."
-                        : "Mulai dengan memilih wilayah di atas."}
+                    {hasFilter
+                      ? "Belum ada jalan rusak yang diverifikasi di wilayah ini."
+                      : "Mulai dengan memilih wilayah di atas."}
                   </p>
                 </div>
               </div>
@@ -263,7 +251,7 @@ export default function MapPage() {
             report={selectedDetail}
             upvotes={upvotes.getCount(selectedId)}
             hasVoted={upvotes.hasVoted(selectedId)}
-            onVote={() => handleVote(selectedId)}
+            onVote={() => upvotes.toggle(selectedId)}
             onClose={() => setSelectedId(null)}
           />
         )}
