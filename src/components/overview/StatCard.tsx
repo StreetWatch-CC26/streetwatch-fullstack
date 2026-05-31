@@ -17,18 +17,23 @@ export function StatCard({
 }: StatCardProps) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 hover:border-primary/30 transition-colors sm:mb-0">
-      <div
-        className={cn(
-          "w-9 h-9 rounded-xl flex items-center justify-center mb-3",
-          accent ?? "bg-primary/10",
-        )}
-      >
-        <Icon
-          className={cn("w-4.5 h-4.5", accent ? "text-white" : "text-primary")}
-        />
-      </div>
-      <div className="font-heading text-2xl font-bold text-foreground leading-none mb-1">
-        {value}
+      <div className="flex justify-between">
+        <div
+          className={cn(
+            "w-9 h-9 rounded-xl flex items-center justify-center mb-3",
+            accent ?? "bg-primary/10",
+          )}
+        >
+          <Icon
+            className={cn(
+              "w-4.5 h-4.5",
+              accent ? "text-white" : "text-primary",
+            )}
+          />
+        </div>
+        <div className="font-heading text-2xl font-bold text-foreground leading-none mb-1">
+          {value}
+        </div>
       </div>
       <div className="text-xs text-muted-foreground">{label}</div>
       {sub && (
