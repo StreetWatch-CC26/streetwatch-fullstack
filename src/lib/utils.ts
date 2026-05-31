@@ -299,3 +299,22 @@ export function formatDateLong(isoString: string): string {
     minute: "2-digit",
   });
 }
+
+/**
+ * Utility untuk membersihkan teks dari spasi dan enter berlebih.
+ * @param text string input dari user
+ * @returns string yang sudah dibersihkan
+ */
+export function cleanExcessWhitespace(text: string): string {
+  if (!text) return "";
+
+  return (
+    text
+      // 1. Menghapus spasi kosong/tab yang tidak sengaja terketik sebelum user menekan enter
+      .replace(/[ \t]+$/gm, "")
+      // 2. Mencegah enter berulang: Mengubah 3 atau lebih enter berturut-turut menjadi maksimal 2 enter (1 baris kosong)
+      .replace(/\n{3,}/g, "\n\n")
+      // 3. Menghapus semua spasi dan enter yang berada di paling awal dan paling AKHIR teks
+      .trim()
+  );
+}
