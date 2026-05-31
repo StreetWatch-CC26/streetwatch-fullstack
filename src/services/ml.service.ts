@@ -84,13 +84,13 @@ export async function analyzeImageWithML(
     ? AbortSignal.any([signal, internalSignal])
     : internalSignal;
 
-  console.log("==================================================");
-  console.log(`[ML Request] 🚀 Memulai proses analisis ML...`);
+  // console.log("==================================================");
+  // console.log(`[ML Request] 🚀 Memulai proses analisis ML...`);
 
   // ── 1. Ambil gambar fisik dari URL ──────────────────────────────────────────
   let imageBlob: Blob;
   try {
-    console.log(`[ML Request] 📥 Mengunduh gambar dari storage...`);
+    // console.log(`[ML Request] 📥 Mengunduh gambar dari storage...`);
     const imgRes = await fetch(imageUrl, { signal: combinedSignal });
     if (!imgRes.ok) throw new Error(`HTTP ${imgRes.status}`);
     imageBlob = await imgRes.blob();
@@ -99,13 +99,13 @@ export async function analyzeImageWithML(
     throw new MLServiceError("Gagal menyiapkan gambar untuk analisis AI.");
   }
 
-  // ── 2. Siapkan FormData (Persis seperti Postman) ──────────────────────────
+  // ── 2. Siapkan FormData ──────────────────────────
   const formData = new FormData();
   // Key harus "file", nama file bisa di-hardcode karena hanya untuk dibaca AI
   formData.append("file", imageBlob, "image.jpg");
 
-  console.log(`[ML Request] 📤 Mengirim file ke HF Space...`);
-  const startTime = performance.now();
+  // console.log(`[ML Request] 📤 Mengirim file ke HF Space...`);
+  // const startTime = performance.now();
 
   let res: Response;
   try {
@@ -127,9 +127,9 @@ export async function analyzeImageWithML(
     );
   }
 
-  const duration = (performance.now() - startTime).toFixed(2);
-  console.log(`[ML Response] ⏱️ Waktu     : ${duration} ms`);
-  console.log(`[ML Response] 📡 Status    : ${res.status} ${res.statusText}`);
+  // const duration = (performance.now() - startTime).toFixed(2);
+  // console.log(`[ML Response] ⏱️ Waktu     : ${duration} ms`);
+  // console.log(`[ML Response] 📡 Status    : ${res.status} ${res.statusText}`);
 
   if (!res.ok) {
     throw new MLServiceError(
@@ -141,8 +141,8 @@ export async function analyzeImageWithML(
   let raw: MLDetectResponse & { message?: string }; // Mengakomodasi format error
   try {
     raw = await res.json();
-    console.log(`[ML Response] 🧠 Data AI   :`, JSON.stringify(raw, null, 2));
-    console.log("==================================================");
+    // console.log(`[ML Response] 🧠 Data AI   :`, JSON.stringify(raw, null, 2));
+    // console.log("==================================================");
   } catch {
     throw new MLServiceError("Response dari ML service bukan JSON yang valid.");
   }
@@ -155,13 +155,13 @@ export async function analyzeImageWithML(
     );
   }
 
-  // Tolak langsung jika bukan foto jalan (kupu-kupu.avif case)
+  // Tolak langsung jika bukan foto jalan
   // Di sini model tidak akan mengembalikan 'image_severity'
   if (!raw.is_road) {
-    throw new MLNotRoadError(); // Pastikan class ini sudah kamu buat/import
+    throw new MLNotRoadError();
   }
 
-  // Jika is_road === true, baru kita wajibkan adanya image_severity
+  // Jika is_road === true, wajibkan adanya image_severity
   if (typeof raw.image_severity !== "string") {
     throw new MLServiceError(
       "Response ML tidak valid: field 'image_severity' hilang pada foto jalan.",
