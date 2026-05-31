@@ -91,7 +91,7 @@ export default function ReportDetailPage() {
           variant="outline"
           className="mt-2"
         >
-          Kembali ke Feed
+          Kembali ke Feeds
         </Button>
       </div>
     );
@@ -220,7 +220,7 @@ export default function ReportDetailPage() {
                 className="w-full gap-2 h-12"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Kembali ke Feed
+                Kembali ke Feeds
               </Button>
             </div>
           </div>
