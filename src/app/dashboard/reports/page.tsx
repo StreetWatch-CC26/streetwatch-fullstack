@@ -42,7 +42,6 @@ interface ApiResponse {
 }
 
 // ── Sort options ──────────────────────────────────────────────────────────────
-
 type SortMode = "priority" | "newest" | "upvotes";
 
 const SORT_OPTIONS: { value: SortMode; label: string }[] = [
@@ -52,15 +51,14 @@ const SORT_OPTIONS: { value: SortMode; label: string }[] = [
 ];
 
 // ── Priority filter chip ──────────────────────────────────────────────────────
-
 type PriorityFilter = "all" | "kritis" | "tinggi" | "sedang" | "rendah";
 
 const PRIORITY_FILTER_OPTIONS: { value: PriorityFilter; label: string }[] = [
   { value: "all", label: "Semua" },
   { value: "kritis", label: "Kritis" },
-  { value: "tinggi", label: "Prioritas Tinggi" },
-  { value: "sedang", label: "Prioritas Sedang" },
-  { value: "rendah", label: "Prioritas Rendah" },
+  { value: "tinggi", label: "Tinggi" },
+  { value: "sedang", label: "Sedang" },
+  { value: "rendah", label: "Rendah" },
 ];
 
 export default function ReportsPage() {
@@ -74,7 +72,7 @@ export default function ReportsPage() {
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
-  const [sortMode, setSortMode] = useState<SortMode>("priority");
+  const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
   // const [exportOpen, setExportOpen] = useState(false);
 
@@ -207,7 +205,7 @@ export default function ReportsPage() {
                 )}
               </div>
 
-              <div className="relative hidden sm:block">
+              <div className="relative hidden md:block">
                 <SlidersHorizontal className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                 <select
                   value={sortMode}
@@ -317,28 +315,45 @@ export default function ReportsPage() {
             </div>
           ) : (
             <>
-              <p className="text-xs text-muted-foreground mb-4">
-                Menampilkan{" "}
-                <span className="font-semibold text-foreground">
-                  {sortedReports.length}
-                </span>{" "}
-                laporan
-                {hasActiveFilter && (
-                  <span>
-                    {" "}
-                    · filter:{" "}
-                    <span className="font-medium text-foreground">
-                      {
-                        PRIORITY_FILTER_OPTIONS.find(
-                          (o) => o.value === priorityFilter,
-                        )?.label
-                      }
+              <div className="flex justify-between items-center mb-2 md:mb-4">
+                <p className="text-xs text-muted-foreground">
+                  Menampilkan{" "}
+                  <span className="font-semibold text-foreground">
+                    {sortedReports.length}
+                  </span>{" "}
+                  laporan
+                  {hasActiveFilter && (
+                    <span>
+                      {" "}
+                      · filter:{" "}
+                      <span className="font-medium text-foreground">
+                        {
+                          PRIORITY_FILTER_OPTIONS.find(
+                            (o) => o.value === priorityFilter,
+                          )?.label
+                        }
+                      </span>
                     </span>
-                  </span>
-                )}
-              </p>
+                  )}
+                </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="relative block md:hidden">
+                  <SlidersHorizontal className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                  <select
+                    value={sortMode}
+                    onChange={(e) => setSortMode(e.target.value as SortMode)}
+                    className="h-9 pl-8 pr-3 rounded-md border border-input bg-background text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    {SORT_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid px-0 sm:px-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {sortedReports.map((report) => (
                   <ReportPost key={report.id} report={report} />
                 ))}
