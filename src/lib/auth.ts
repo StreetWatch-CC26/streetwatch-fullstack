@@ -52,45 +52,50 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    ...authConfig.callbacks,
-
-    // Override callback jwt untuk menyuntikkan data dari Prisma
     async jwt({ token, user, account, trigger, session }) {
-      // 1. Eksekusi callback bawaan dari authConfig terlebih dahulu
-      let finalToken = token;
-      if (authConfig.callbacks?.jwt) {
-        finalToken = await authConfig.callbacks.jwt({
-          token,
-          user,
-          trigger,
-          session,
-        });
+      if (user) {
+        token.id = user.id!;
+        token.role = user.role;
+        token.hasPassword = user.hasPassword;
+      }
+      if (trigger === "update" && session?.hasPassword !== undefined) {
+        token.hasPassword = session.hasPassword as boolean;
+        token.justRegistered = false;
       }
 
-      // 2. Logika KHUSUS Google Login (Hanya dieksekusi saat login pertama kali via OAuth)
       if (account?.provider === "google" && user?.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: user.email },
           select: { password: true, role: true },
         });
-
-        finalToken.hasPassword = !!dbUser?.password;
-        finalToken.role = dbUser?.role ?? "CITIZEN";
-        // Flag ini berguna untuk middleware mengarahkan ke halaman set-password
-        finalToken.justRegistered = !dbUser?.password;
+        token.hasPassword = !!dbUser?.password;
+        token.role = dbUser?.role ?? "CITIZEN";
+        token.justRegistered = !dbUser?.password;
       }
 
-      // 3. Fallback jika token lama tidak memiliki data hasPassword/role
-      if (finalToken.id && finalToken.hasPassword === undefined) {
+      if (token.id && token.hasPassword === undefined) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: finalToken.id as string },
+          where: { id: token.id as string },
           select: { password: true, role: true },
         });
-        finalToken.hasPassword = !!dbUser?.password;
-        finalToken.role = dbUser?.role ?? "CITIZEN";
+        token.hasPassword = !!dbUser?.password;
+        token.role = dbUser?.role ?? "CITIZEN";
       }
 
-      return finalToken;
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = (token.role as "CITIZEN" | "ADMIN") ?? "CITIZEN";
+        session.user.hasPassword = (token.hasPassword as boolean) ?? false;
+        if (token.justRegistered !== undefined) {
+          session.user.justRegistered =
+            (token.justRegistered as boolean) ?? false;
+        }
+      }
+      return session;
     },
   },
 });
