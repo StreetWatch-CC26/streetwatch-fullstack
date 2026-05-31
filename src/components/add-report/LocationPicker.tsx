@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, MapPin, Crosshair } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { injectCSS } from "@/lib/utils";
 
 interface LocationPickerProps {
   lat: number;
@@ -11,19 +12,8 @@ interface LocationPickerProps {
   onLocationChange: (lat: number, lng: number) => void;
 }
 
-// ── Inject external CSS once ───────────────────────────────────────────────────
-function injectCSS(href: string, id: string) {
-  if (document.getElementById(id)) return;
-  const el = document.createElement("link");
-  el.id = id;
-  el.rel = "stylesheet";
-  el.href = href;
-  document.head.appendChild(el);
-}
-
 // ── Custom Modern Pin Icon ───────────────────────────────────────────────────
 function pickerPinIcon(L: any) {
-  // Pin warna primer (biru) untuk picker
   const color = "oklch(0.511 0.096 186.391)"; // Menggunakan warna --primary
   return L.divIcon({
     html: `
@@ -47,19 +37,18 @@ export function LocationPicker({
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   // ── Initialize Map ──────────────────────────────────────────────────────────
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    // Strict Mode cleanup
     if ((el as any)._leaflet_id) delete (el as any)._leaflet_id;
     if (mapRef.current) return;
 
     let alive = true;
 
-    // Inject CSS Leaflet
     injectCSS(
       "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
       "leaflet-css",
@@ -78,7 +67,7 @@ export function LocationPicker({
       const map = L.map(containerRef.current, {
         center: [lat, lng],
         zoom: 16,
-        zoomControl: false, // Kita pindahkan ke kanan bawah atau hapus
+        zoomControl: false,
         attributionControl: false,
       });
 
@@ -97,15 +86,18 @@ export function LocationPicker({
       }).addTo(map);
 
       // 3. Event Listeners
-      // Saat marker selesai ditarik
       marker.on("dragend", (e: any) => {
         const position = e.target.getLatLng();
         onLocationChange(position.lat, position.lng);
       });
 
-      // Saat peta diklik
       map.on("click", (e: any) => {
+        // Animasi halus saat marker pindah
         marker.setLatLng(e.latlng);
+        map.flyTo(e.latlng, map.getZoom(), {
+          animate: true,
+          duration: 0.5,
+        });
         onLocationChange(e.latlng.lat, e.latlng.lng);
       });
 
@@ -129,7 +121,6 @@ export function LocationPicker({
   useEffect(() => {
     if (mapRef.current && markerRef.current) {
       const currentPos = markerRef.current.getLatLng();
-      // Hanya set ulang jika perubahannya signifikan (mencegah infinite loop)
       if (
         Math.abs(currentPos.lat - lat) > 0.0001 ||
         Math.abs(currentPos.lng - lng) > 0.0001
@@ -142,11 +133,13 @@ export function LocationPicker({
 
   const handleRecenter = () => {
     if (mapRef.current) {
-      mapRef.current.setView([lat, lng], 17);
+      // Gunakan flyTo untuk efek smooth panning
+      mapRef.current.flyTo([lat, lng], 17, { duration: 0.5 });
     }
   };
 
   const handleCurrentLocation = async () => {
+    setIsLocating(true);
     try {
       const position = await new Promise<GeolocationPosition>(
         (resolve, reject) => {
@@ -164,13 +157,15 @@ export function LocationPicker({
 
       if (mapRef.current && markerRef.current) {
         markerRef.current.setLatLng([newLat, newLng]);
-        mapRef.current.flyTo([newLat, newLng], 17, { duration: 0.5 });
+        mapRef.current.flyTo([newLat, newLng], 17, { duration: 0.8 });
       }
     } catch (error) {
       console.error("Failed to get current location:", error);
       alert(
-        "Gagal mendapatkan lokasi saat ini. Pastikan GPS aktif dan izin lokasi diberikan.",
+        "Gagal mendapatkan lokasi saat ini. Pastikan GPS aktif dan izin lokasi diberikan pada browser Anda.",
       );
+    } finally {
+      setIsLocating(false);
     }
   };
 
@@ -180,62 +175,77 @@ export function LocationPicker({
         {/* Map Container */}
         <div
           ref={containerRef}
-          className="w-full h-87.5 md:h-100 rounded-lg border border-border z-0"
+          className="w-full h-87.5 md:h-100 rounded-xl border border-border z-0 overflow-hidden"
         />
 
-        {/* Loading Overlay */}
         {!isMapLoaded && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-muted/80 backdrop-blur-sm rounded-lg">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-primary" />
-              <p className="text-sm font-medium">Memuat peta OSM...</p>
-            </div>
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-muted/80 backdrop-blur-sm rounded-xl">
+            <Loader2 className="w-8 h-8 animate-spin mb-3 text-primary" />
+            <p className="text-sm font-medium text-foreground">
+              Memuat peta...
+            </p>
           </div>
         )}
 
-        {/* Custom Controls (Berada di atas peta) */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 z-400">
+        <div className="absolute bottom-3 left-3 flex flex-row gap-2 z-400 items-end">
           <Button
             type="button"
-            size="icon"
             variant="secondary"
+            size="sm"
+            disabled={isLocating}
             onClick={handleCurrentLocation}
-            className="shadow-lg hover:bg-primary hover:text-primary-foreground transition-colors"
-            title="Gunakan lokasi saat ini"
+            className="shadow-lg bg-background/95 border-border hover:bg-primary hover:text-primary-foreground transition-all rounded-full px-3 pl-2"
           >
-            <Crosshair className="w-4 h-4" />
+            {isLocating ? (
+              <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+            ) : (
+              <Crosshair className="w-4 h-4 mr-1.5" />
+            )}
+            <span className="text-xs font-semibold">
+              {isLocating ? "Mencari GPS..." : "Lokasi Saya"}
+            </span>
           </Button>
 
+          {/* Tombol Recenter Marker */}
           <Button
             type="button"
-            size="icon"
             variant="secondary"
+            size="sm"
             onClick={handleRecenter}
-            className="shadow-lg hover:bg-primary hover:text-primary-foreground transition-colors"
-            title="Pusatkan ke marker"
+            className="shadow-lg bg-background/95 border-border hover:bg-primary hover:text-primary-foreground transition-all rounded-full px-3 pl-2"
           >
-            <MapPin className="w-4 h-4" />
+            <MapPin className="w-4 h-4 mr-1.5" />
+            <span className="text-xs font-semibold">Ke Posisi Pin</span>
           </Button>
         </div>
 
-        {/* Coordinates Display */}
-        <div className="absolute bottom-3 left-3 bg-background/95 backdrop-blur-sm px-3 py-1.5 rounded-md shadow border border-border z-400 pointer-events-none">
-          <p className="text-[11px] font-mono font-medium text-foreground">
+        <div className="absolute top-3 left-3 bg-background/95 backdrop-blur-md px-2.5 py-1.5 rounded-lg shadow-sm border border-border/50 z-400 pointer-events-none">
+          <p className="text-[10px] font-mono font-semibold text-muted-foreground">
             {lat.toFixed(6)}, {lng.toFixed(6)}
           </p>
         </div>
       </div>
 
-      <div className="flex items-start gap-2 p-3 bg-foreground/10 rounded-lg border border-primary/10">
-        <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-3.5 bg-muted/40 rounded-xl border border-border/60">
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+          <MapPin className="w-4 h-4 text-primary" />
+        </div>
         <div className="text-sm">
-          <p className="font-semibold text-foreground mb-1 text-xs">
-            Instruksi Peta:
+          <p className="font-semibold text-foreground text-sm mb-1">
+            Cara Menentukan Lokasi
           </p>
-          <ul className="text-foreground space-y-0.5 text-xs font-bold list-disc">
-            <li>Sentuh peta untuk memindahkan pin lokasi</li>
-            <li>Seret (Drag) pin untuk penyesuaian akurat</li>
-            <li>Data wilayah (Kecamatan/Kelurahan) akan otomatis diperbarui</li>
+          <ul className="text-muted-foreground space-y-1 text-xs list-disc pl-4">
+            <li>
+              <strong>Sentuh/klik peta</strong> untuk memindahkan pin ke titik
+              yang dituju.
+            </li>
+            <li>
+              <strong>Seret pin</strong> merah untuk akurasi yang lebih presisi.
+            </li>
+            <li>
+              Data kecamatan & alamat di bawah akan{" "}
+              <strong>otomatis terisi</strong>.
+            </li>
           </ul>
         </div>
       </div>
