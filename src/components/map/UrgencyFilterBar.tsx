@@ -139,7 +139,7 @@ export function UrgencyFilterBar({
         onClick={handleAllClick}
         aria-pressed={allActive}
         className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-semibold",
+          "inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[8px] md:text-[10px] font-semibold",
           "border transition-all duration-150 select-none",
           "ring-1 ring-transparent",
           allActive
@@ -162,7 +162,7 @@ export function UrgencyFilterBar({
             onClick={() => handleChipClick(level.value)}
             aria-pressed={isActive}
             className={cn(
-              "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold",
+              "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] md:text-[10px]",
               "border transition-all duration-150 select-none",
               "ring-1",
               isActive
