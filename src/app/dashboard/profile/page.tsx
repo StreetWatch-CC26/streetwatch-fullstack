@@ -13,7 +13,7 @@ export default function ProfilePage() {
 
   return (
     <div className="px-4 py-6 max-w-3xl mx-auto space-y-6">
-      <h1 className="font-heading text-2xl font-bold text-foreground">
+      <h1 className="sr-only font-heading text-2xl font-bold text-foreground">
         Profil Saya
       </h1>
 
