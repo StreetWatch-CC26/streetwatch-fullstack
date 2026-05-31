@@ -134,7 +134,7 @@ export function ReportPost({ report }: ReportPostProps) {
         <div className="grow">
           <p className="text-sm text-foreground">
             <span className="font-semibold mr-2">{report.title}</span>
-            <span className="text-muted-foreground line-clamp-2 mt-1">
+            <span className="text-xs text-muted-foreground line-clamp-5 mt-1">
               {report.description || "Tidak ada deskripsi yang diberikan."}
             </span>
           </p>
