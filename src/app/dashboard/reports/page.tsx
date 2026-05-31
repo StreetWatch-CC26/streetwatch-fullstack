@@ -245,7 +245,7 @@ export default function ReportsPage() {
                     key={opt.value}
                     onClick={() => setPriorityFilter(opt.value)}
                     className={cn(
-                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold",
+                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] md:text-[10px] font-semibold",
                       "border transition-all duration-150 select-none ring-1",
                       isActive && opt.value === "all"
                         ? "bg-foreground/8 border-foreground/20 text-foreground ring-foreground/15"
@@ -266,7 +266,7 @@ export default function ReportsPage() {
                     {opt.label}
                     <span
                       className={cn(
-                        "tabular-nums font-mono text-[9px] px-1 py-0.5 rounded min-w-4 text-center",
+                        "tabular-nums font-mono md:text-[9px] px-1 py-0.5 rounded min-w-4 text-center",
                         isActive
                           ? "bg-current/10 text-current"
                           : "bg-muted/60 text-muted-foreground",
