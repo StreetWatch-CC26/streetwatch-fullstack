@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
+import { cleanExcessWhitespace, cn } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,6 @@ import {
   User,
   ThumbsUp,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 import { AIAnalysisCard } from "@/components/reports/AIAnalysisCard";
 import { useUpvotes } from "@/hooks/useUpvotes";
@@ -159,8 +159,9 @@ export default function ReportDetailPage() {
 
             <Card className="shadow-sm">
               <CardContent>
-                <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
-                  {report.description || "Tidak ada deskripsi yang diberikan."}
+                <p className="text-foreground/80 leading-relaxed text-justify whitespace-pre-wrap text-sm sm:text-base">
+                  {cleanExcessWhitespace(report.description) ||
+                    "Tidak ada deskripsi yang diberikan."}
                 </p>
               </CardContent>
             </Card>
