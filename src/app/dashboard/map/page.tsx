@@ -105,15 +105,11 @@ export default function MapPage() {
       setIsLoadingDetail(true);
       try {
         const res = await fetch(`/api/reports/${selectedId}`);
-        const json = (await res.json()) as {
-          success: boolean;
-          data: Report & { imageUrls?: string[]; upvotes?: { id: string }[] };
-        };
+        const json = await res.json();
 
         if (json.success && isActive) {
           const d = json.data;
-          (d as Report & { imageUrl?: string }).imageUrl =
-            d.imageUrls?.[0] ?? null;
+          d.imageUrl = d.imageUrls?.[0] || null;
           setSelectedDetail(d);
           upvotes.sync(d.id, d.upvoteCount, Boolean(d.upvotes?.length));
         }
