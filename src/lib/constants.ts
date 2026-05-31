@@ -20,6 +20,23 @@ export const URGENCY_HEX: Record<Urgency, string> = {
   low: "#22c55e",
 };
 
+/**
+ * Urutan prioritas: high > medium > low
+ * Cluster mengambil warna urgency tertinggi dari child-nya.
+ */
+export const URGENCY_PRIORITY: Record<Urgency, number> = {
+  high: 3,
+  medium: 2,
+  low: 1,
+};
+
+/** Warna ring/glow per urgency untuk cluster aktif */
+export const URGENCY_GLOW: Record<Urgency, string> = {
+  high: "rgba(239,68,68,0.35)",
+  medium: "rgba(234,179,8,0.35)",
+  low: "rgba(34,197,94,0.35)",
+};
+
 export const STATUS_LABEL: Record<string, string> = {
   verified: "Terverifikasi",
   fail: "Analisis Gagal",
