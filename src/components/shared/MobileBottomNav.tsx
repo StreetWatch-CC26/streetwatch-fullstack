@@ -26,6 +26,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import ThemeToggle from "./ThemeToggle";
 
 // Navigasi Utama (Bottom Bar)
 const mainNavItems = [
@@ -75,7 +76,6 @@ export function MobileBottomNav() {
           "px-1",
         )}
       >
-        {/* Render 4 item pertama seperti biasa */}
         {mainNavItems.map((item) => {
           const isActive = pathname?.startsWith(item.url) ?? false;
           const isCta = item.cta;
@@ -185,7 +185,7 @@ export function MobileBottomNav() {
             aria-describedby="Menu lainnya"
             className="z-1100 bg-background/95 backdrop-blur-xl border-t border-border"
           >
-            <div className="mx-auto w-full max-w-sm px-4 pb-8 pt-4">
+            <div className="mx-auto w-full max-w-sm px-4 pb-8">
               <DrawerHeader className="text-left px-0 pb-4">
                 <DrawerTitle className="text-lg font-bold">
                   Menu Street Watch
@@ -194,6 +194,7 @@ export function MobileBottomNav() {
                   Akses fitur lainnya seperti laporan saya, pengaturan akun, dan
                   lainnya.
                 </DrawerDescription>
+                <ThemeToggle className="absolute top-4 right-4" />
               </DrawerHeader>
 
               <div className="space-y-6">
