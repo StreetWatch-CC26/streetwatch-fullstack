@@ -595,3 +595,72 @@ export function findProvinsi(query: string): WilayahCoord | undefined {
 export function findKabupaten(query: string): WilayahCoord | undefined {
   return KABUPATEN_BY_ID.get(query) ?? KABUPATEN_BY_NAMA.get(norm(query));
 }
+
+// ─── Wilayah Name Matcher (Nominatim → Canonical) ─────────────────────────────
+
+const STRIP_PREFIX_RE =
+  /^(kota|kabupaten|kab\.?|kec\.?|desa|kelurahan|kel\.?|provinsi|prov\.?)\s+/i;
+
+function stripPrefix(s: string): string {
+  return norm(s).replace(STRIP_PREFIX_RE, "").trim();
+}
+
+/**
+ * Cari WilayahCoord dari nama Nominatim (tanpa prefix "Kota"/"Kabupaten").
+ * Urutan: exact → strip-prefix exact → contains → word-overlap ≥ 0.5
+ */
+function matchFromList(
+  input: string,
+  list: WilayahCoord[],
+  byNama: Map<string, WilayahCoord>,
+): WilayahCoord | undefined {
+  if (!input) return undefined;
+
+  const n = norm(input);
+
+  // 1. Exact match
+  const exact = byNama.get(n);
+  if (exact) return exact;
+
+  // 2. Strip prefix lalu exact
+  const stripped = stripPrefix(input);
+  const withPrefixes = ["kota ", "kabupaten "] as const;
+  for (const prefix of withPrefixes) {
+    const candidate = byNama.get(prefix + stripped);
+    if (candidate) return candidate;
+  }
+
+  // 3. Contains match
+  const contains = list.find((w) => {
+    const wn = stripPrefix(w.nama);
+    return wn === stripped || wn.includes(stripped) || stripped.includes(wn);
+  });
+  if (contains) return contains;
+
+  // 4. Word overlap ≥ 0.5
+  const inputWords = stripped.split(" ");
+  let bestMatch: WilayahCoord | undefined;
+  let bestScore = 0;
+
+  for (const w of list) {
+    const wWords = stripPrefix(w.nama).split(" ");
+    const overlap = inputWords.filter((word) => wWords.includes(word)).length;
+    const score = overlap / Math.max(inputWords.length, wWords.length);
+    if (score > bestScore && score >= 0.5) {
+      bestScore = score;
+      bestMatch = w;
+    }
+  }
+
+  return bestMatch;
+}
+
+/** Match nama kota/kabupaten dari Nominatim → canonical WilayahCoord */
+export function matchKabupaten(input: string): WilayahCoord | undefined {
+  return matchFromList(input, KABUPATEN_COORDS, KABUPATEN_BY_NAMA);
+}
+
+/** Match nama provinsi dari Nominatim → canonical WilayahCoord */
+export function matchProvinsi(input: string): WilayahCoord | undefined {
+  return matchFromList(input, PROVINSI_COORDS, PROVINSI_BY_NAMA);
+}
