@@ -16,7 +16,7 @@ export async function GET(
 
     const res = await fetch(`${UPSTREAM}/${path}`, {
       headers: {
-        "User-Agent": "StreetWatch/1.0",
+        "User-Agent": "StreetWatch/1.0.0",
         Accept: "application/json",
       },
       next: { revalidate: 86400 },
