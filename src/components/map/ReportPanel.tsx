@@ -9,7 +9,7 @@
  */
 
 import { useEffect } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
@@ -72,7 +72,7 @@ export function ReportPanel({
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const displayImage = report.imageUrl || (report as any).imageUrls?.[0];
+  // const displayImage = report.imageUrl || (report as any).imageUrls?.[0];
 
   return (
     <>
@@ -128,7 +128,7 @@ export function ReportPanel({
         {/* Body (Scrollable) */}
         <div className="px-4 py-3 space-y-3 overflow-y-auto overscroll-contain">
           {/* ─── Image Section ─── */}
-          {displayImage ? (
+          {/* {displayImage ? (
             <div className="relative w-full h-36 md:h-40 rounded-lg overflow-hidden border border-border shrink-0 bg-muted">
               <Image
                 src={displayImage}
@@ -146,7 +146,7 @@ export function ReportPanel({
                 Tidak ada foto
               </span>
             </div>
-          )}
+          )} */}
 
           {/* Location */}
           <div className="flex items-start gap-2">
