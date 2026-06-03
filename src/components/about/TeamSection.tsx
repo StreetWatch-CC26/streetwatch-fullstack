@@ -10,7 +10,7 @@ const team = [
   {
     name: "Ali Musthafa Kamal",
     role: "Team Lead & Full Stack Developer",
-    image: "/images/avatars/ali.jpg",
+    image: "/images/avatars/ali.webp",
     initials: "AMK",
     bio: "S1 Sistem Informasi Universitas Riau sekaligus Full Stack Web Developer yang bersemangat dengan pengalaman lebih dari satu tahun, saya mengkhususkan diri dalam membangun aplikasi web modern, terukur, dan berkinerja tinggi, terutama menggunakan MERN stack (MongoDB, Express, React, Node.js) dan ekosistem Next.js",
     links: {
@@ -23,7 +23,7 @@ const team = [
   {
     name: "Firza Hakim",
     role: "AI Engineer",
-    image: "/images/avatars/firza.jpg",
+    image: "/images/avatars/firza.webp",
     initials: "FH",
     bio: "PhD Computer Vision dari UI. Membangun model AI deteksi kerusakan dari nol.",
     links: {
@@ -36,7 +36,7 @@ const team = [
   {
     name: "⁠Dzakiya Hakima Adila",
     role: "AI Engineer",
-    image: "/images/avatars/kiya.jpg",
+    image: "/images/avatars/kiya.webp",
     initials: "DHA",
     bio: "Ex-Tokopedia design lead. Membuat teknologi kompleks terasa sederhana bagi semua orang.",
     links: {
@@ -48,7 +48,7 @@ const team = [
   {
     name: "Della Nurizki",
     role: "Data Scientist",
-    image: "/images/avatars/della.jpg",
+    image: "/images/avatars/della.webp",
     initials: "DN",
     bio: "Full-stack + DevOps. Menjaga StreetWatch tetap berjalan 24/7 dengan uptime 99.9%.",
     links: {
@@ -60,7 +60,7 @@ const team = [
   {
     name: "Moch.Alif Budi Setyawan",
     role: "Data Scientist",
-    image: "/images/avatars/alif.jpg",
+    image: "/images/avatars/alif.webp",
     initials: "ABS",
     bio: "Membangun jaringan 50.000+ pelapor aktif dan menjaga hubungan komunitas di 18 kota.",
     links: {
@@ -72,7 +72,7 @@ const team = [
   {
     name: "Rangga Adi",
     role: "Backend Developer",
-    image: "/images/avatars/rangga.jpg",
+    image: "/images/avatars/rangga.webp",
     initials: "RA",
     bio: "10 tahun di sektor publik. Jembatan antara StreetWatch dan pemerintah daerah.",
     links: {
