@@ -18,14 +18,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Loader2,
-  MapPin,
-  Send,
-  ImageOff,
-  AlertCircle,
-  FileText,
-} from "lucide-react";
+import { Loader2, MapPin, Send, ImageOff, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -348,20 +341,6 @@ export function AddReportForm() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6 pb-24 md:pb-8">
-        {Object.keys(errors).length > 0 && (
-          <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-semibold">Mohon perbaiki isian berikut:</p>
-              <ul className="list-disc pl-4 mt-1 opacity-90">
-                {Object.values(errors).map((err, i) => (
-                  <li key={i}>{err}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
         <Card className="border-border shadow-sm">
           <CardContent className="p-4 md:p-6">
             <ImageUpload
