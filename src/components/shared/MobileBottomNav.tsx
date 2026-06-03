@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { signOut } from 'next-auth/react';
 
 import {
   RiPieChart2Fill,
@@ -14,9 +15,8 @@ import {
   RiGlobalFill,
   RiHome6Fill,
   RiAccountCircleFill,
-} from "@remixicon/react";
-
-import { LogOut, ChevronRight } from "lucide-react";
+} from '@remixicon/react';
+import { LogOut, ChevronRight } from 'lucide-react';
 
 import {
   Drawer,
@@ -25,19 +25,19 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
+} from '@/components/ui/drawer';
 
 // Navigasi Utama (Bottom Bar)
 const mainNavItems = [
-  { title: "Beranda", url: "/dashboard/reports", icon: RiHome6Fill },
-  { title: "Peta", url: "/dashboard/map", icon: RiCompassDiscoverFill },
+  { title: 'Beranda', url: '/dashboard/reports', icon: RiHome6Fill },
+  { title: 'Peta', url: '/dashboard/map', icon: RiCompassDiscoverFill },
   {
-    title: "Lapor",
-    url: "/dashboard/reports/new",
+    title: 'Lapor',
+    url: '/dashboard/reports/new',
     icon: RiAddCircleFill,
     cta: true,
   },
-  { title: "Profil", url: "/dashboard/profile", icon: RiAccountCircleFill },
+  { title: 'Profil', url: '/dashboard/profile', icon: RiAccountCircleFill },
   // { title: "AI", url: "/dashboard/playground", icon: RiFlaskFill },
 ];
 
@@ -50,9 +50,9 @@ const menuGroups = [
   //   ],
   // },
   {
-    title: "Aktivitas",
+    title: 'Aktivitas',
     items: [
-      { label: "Overview", icon: RiPieChart2Fill, url: "/dashboard/overview" },
+      { label: 'Overview', icon: RiPieChart2Fill, url: '/dashboard/overview' },
     ],
   },
 ];
@@ -61,18 +61,22 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
 
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' });
+  };
+
   return (
     <>
       <nav
         className={cn(
-          "sm:hidden",
-          "fixed bottom-4 left-4 right-4",
-          "z-1000",
-          "h-16 flex items-center justify-around",
-          "rounded-2xl border border-border/60",
-          "bg-background/85 backdrop-blur-xl",
-          "shadow-[0_8px_32px_-4px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.04)]",
-          "px-1",
+          'sm:hidden',
+          'fixed bottom-4 left-4 right-4',
+          'z-1000',
+          'h-16 flex items-center justify-around',
+          'rounded-2xl border border-border/60',
+          'bg-background/85 backdrop-blur-xl',
+          'shadow-[0_8px_32px_-4px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.04)]',
+          'px-1',
         )}
       >
         {mainNavItems.map((item) => {
@@ -85,44 +89,44 @@ export function MobileBottomNav() {
               href={item.url}
               onClick={() => setIsDrawerOpen(false)}
               className={cn(
-                "relative flex flex-col items-center justify-center gap-0.5",
-                "flex-1 h-full rounded-xl transition-all duration-200",
-                "select-none tap-highlight-transparent",
-                isActive && !isCta ? "text-primary" : "text-muted-foreground",
-                !isActive && "hover:text-foreground",
+                'relative flex flex-col items-center justify-center gap-0.5',
+                'flex-1 h-full rounded-xl transition-all duration-200',
+                'select-none tap-highlight-transparent',
+                isActive && !isCta ? 'text-primary' : 'text-muted-foreground',
+                !isActive && 'hover:text-foreground',
               )}
             >
               {isCta ? (
                 <div
                   className={cn(
-                    "flex flex-col items-center justify-center",
-                    "w-12 h-12 -mt-5 rounded-2xl",
-                    "bg-primary shadow-lg shadow-primary/35",
-                    "transition-transform duration-150 active:scale-95",
-                    isActive && "ring-4 ring-primary/20",
+                    'flex flex-col items-center justify-center',
+                    'w-12 h-12 -mt-5 rounded-2xl',
+                    'bg-primary shadow-lg shadow-primary/35',
+                    'transition-transform duration-150 active:scale-95',
+                    isActive && 'ring-4 ring-primary/20',
                   )}
                 >
-                  <item.icon className="h-6 w-6 text-primary-foreground" />
+                  <item.icon className='h-6 w-6 text-primary-foreground' />
                 </div>
               ) : (
                 <>
                   <div
                     className={cn(
-                      "flex items-center justify-center w-10 h-7 rounded-lg transition-all duration-200",
-                      isActive ? "bg-primary/10" : "bg-transparent",
+                      'flex items-center justify-center w-10 h-7 rounded-lg transition-all duration-200',
+                      isActive ? 'bg-primary/10' : 'bg-transparent',
                     )}
                   >
                     <item.icon
                       className={cn(
-                        "transition-all duration-200",
-                        isActive ? "h-5.5 w-5.5" : "h-5 w-5",
+                        'transition-all duration-200',
+                        isActive ? 'h-5.5 w-5.5' : 'h-5 w-5',
                       )}
                     />
                   </div>
                   <span
                     className={cn(
-                      "text-[9px] font-medium leading-none transition-all duration-200",
-                      isActive ? "opacity-100" : "opacity-60",
+                      'text-[9px] font-medium leading-none transition-all duration-200',
+                      isActive ? 'opacity-100' : 'opacity-60',
                     )}
                   >
                     {item.title}
@@ -132,10 +136,10 @@ export function MobileBottomNav() {
               {isCta && (
                 <span
                   className={cn(
-                    "text-[9px] font-medium leading-none mt-0.5",
+                    'text-[9px] font-medium leading-none mt-0.5',
                     isActive
-                      ? "text-primary"
-                      : "text-muted-foreground opacity-60",
+                      ? 'text-primary'
+                      : 'text-muted-foreground opacity-60',
                   )}
                 >
                   {item.title}
@@ -150,29 +154,29 @@ export function MobileBottomNav() {
           <DrawerTrigger asChild>
             <button
               className={cn(
-                "relative flex flex-col items-center justify-center gap-0.5",
-                "flex-1 h-full rounded-xl transition-all duration-200",
-                "select-none tap-highlight-transparent text-muted-foreground hover:text-foreground",
-                isDrawerOpen && "text-primary",
+                'relative flex flex-col items-center justify-center gap-0.5',
+                'flex-1 h-full rounded-xl transition-all duration-200',
+                'select-none tap-highlight-transparent text-muted-foreground hover:text-foreground',
+                isDrawerOpen && 'text-primary',
               )}
             >
               <div
                 className={cn(
-                  "flex items-center justify-center w-10 h-7 rounded-lg transition-all duration-200",
-                  isDrawerOpen ? "bg-primary/10" : "bg-transparent",
+                  'flex items-center justify-center w-10 h-7 rounded-lg transition-all duration-200',
+                  isDrawerOpen ? 'bg-primary/10' : 'bg-transparent',
                 )}
               >
                 <RiMenuFill
                   className={cn(
-                    "transition-all duration-200",
-                    isDrawerOpen ? "h-5.5 w-5.5" : "h-5 w-5",
+                    'transition-all duration-200',
+                    isDrawerOpen ? 'h-5.5 w-5.5' : 'h-5 w-5',
                   )}
                 />
               </div>
               <span
                 className={cn(
-                  "text-[9px] font-medium leading-none transition-all duration-200",
-                  isDrawerOpen ? "opacity-100" : "opacity-60",
+                  'text-[9px] font-medium leading-none transition-all duration-200',
+                  isDrawerOpen ? 'opacity-100' : 'opacity-60',
                 )}
               >
                 Lainnya
@@ -181,49 +185,49 @@ export function MobileBottomNav() {
           </DrawerTrigger>
 
           <DrawerContent
-            aria-describedby="Menu lainnya"
-            className="z-1100 bg-background/95 backdrop-blur-xl border-t border-border"
+            aria-describedby='Menu lainnya'
+            className='z-1100 bg-background/95 backdrop-blur-xl border-t border-border'
           >
-            <div className="mx-auto w-full max-w-sm px-4 pb-8">
-              <DrawerHeader className="text-left px-0 pb-4">
-                <DrawerTitle className="text-lg font-bold">
+            <div className='mx-auto w-full max-w-sm px-4 pb-8'>
+              <DrawerHeader className='text-left px-0 pb-4'>
+                <DrawerTitle className='text-lg font-bold'>
                   Menu Street Watch
                 </DrawerTitle>
-                <DrawerDescription className="sr-only">
+                <DrawerDescription className='sr-only'>
                   Akses fitur lainnya seperti laporan saya, pengaturan akun, dan
                   lainnya.
                 </DrawerDescription>
               </DrawerHeader>
 
-              <div className="space-y-6">
+              <div className='space-y-6'>
                 {menuGroups.map((group, idx) => (
                   <div key={idx}>
-                    <h4 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">
+                    <h4 className='text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider'>
                       {group.title}
                     </h4>
-                    <div className="flex flex-col gap-1 bg-card rounded-xl p-2 border border-border/50">
+                    <div className='flex flex-col gap-1 bg-card rounded-xl p-2 border border-border/50'>
                       {group.items.map((item, itemIdx) =>
                         item.url ? (
                           <Link
                             key={itemIdx}
                             href={item.url}
                             onClick={() => setIsDrawerOpen(false)}
-                            className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-colors active:scale-[0.98]"
+                            className='flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-colors active:scale-[0.98]'
                           >
-                            <div className="flex items-center gap-3 text-sm font-medium">
-                              <item.icon className="w-5 h-5 text-muted-foreground" />
+                            <div className='flex items-center gap-3 text-sm font-medium'>
+                              <item.icon className='w-5 h-5 text-muted-foreground' />
                               {item.label}
                             </div>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+                            <ChevronRight className='w-4 h-4 text-muted-foreground/50' />
                           </Link>
                         ) : (
                           <button
                             key={itemIdx}
                             onClick={() => {}}
-                            className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-colors active:scale-[0.98]"
+                            className='flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-colors active:scale-[0.98]'
                           >
-                            <div className="flex items-center gap-3 text-sm font-medium">
-                              <item.icon className="w-5 h-5 text-muted-foreground" />
+                            <div className='flex items-center gap-3 text-sm font-medium'>
+                              <item.icon className='w-5 h-5 text-muted-foreground' />
                               {item.label}
                             </div>
                           </button>
@@ -233,17 +237,21 @@ export function MobileBottomNav() {
                   </div>
                 ))}
 
-                <button className="flex items-center gap-3 p-3 w-full rounded-lg text-destructive hover:bg-destructive/10 transition-colors active:scale-[0.98]">
-                  <LogOut className="w-5 h-5" />
-                  <span className="text-sm font-semibold">Keluar Akun</span>
+                <button
+                  onClick={handleLogout}
+                  className='flex items-center gap-3 p-3 w-full rounded-lg 
+                  text-destructive hover:bg-destructive/10 transition-colors active:scale-[0.98]'
+                >
+                  <LogOut className='w-5 h-5' />
+                  <span className='text-sm font-semibold'>Keluar Akun</span>
                 </button>
 
                 <Link
-                  href="/"
-                  className="flex items-center gap-3 p-3 w-full rounded-lg text-primary hover:bg-primary/10 transition-colors active:scale-[0.98]"
+                  href='/'
+                  className='flex items-center gap-3 p-3 w-full rounded-lg text-primary hover:bg-primary/10 transition-colors active:scale-[0.98]'
                 >
-                  <RiGlobalFill className="w-5 h-5" />
-                  <span className="text-sm font-semibold">Public Site</span>
+                  <RiGlobalFill className='w-5 h-5' />
+                  <span className='text-sm font-semibold'>Public Site</span>
                 </Link>
               </div>
             </div>
