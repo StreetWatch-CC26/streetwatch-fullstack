@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import imageCompression from "browser-image-compression";
+import { matchKabupaten, matchProvinsi } from "@/data/wilayahCoord";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -145,9 +146,8 @@ export async function reverseGeocode(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
       {
         headers: {
-          // Nominatim mewajibkan User-Agent yang jelas agar tidak diblokir
-          "User-Agent": "StreetWatch-App/1.0",
-          "Accept-Language": "id-ID,id;q=0.9", // Meminta hasil dalam Bahasa Indonesia
+          "User-Agent": "StreetWatch-App/1.0.0",
+          "Accept-Language": "id-ID,id;q=0.9",
         },
       },
     );
@@ -157,9 +157,16 @@ export async function reverseGeocode(
     const data = await res.json();
     const addr = data.address || {};
 
-    // Nominatim memiliki banyak variasi nama key, kita petakan ke format kita
+    // Raw dari Nominatim
+    const rawKota =
+      addr.city || addr.town || addr.municipality || addr.regency || "";
+    const rawProvinsi = addr.state || addr.region || "";
+
+    // ↓ Match ke canonical name dari wilayahCoord
+    const canonicalKota = matchKabupaten(rawKota)?.nama ?? rawKota;
+    const canonicalProvinsi = matchProvinsi(rawProvinsi)?.nama ?? rawProvinsi;
+
     return {
-      // Prioritaskan nama jalan, path, atau tempat. Fallback ke display_name bagian pertama
       address:
         addr.road ||
         addr.pedestrian ||
@@ -174,12 +181,11 @@ export async function reverseGeocode(
         addr.residential ||
         "",
       kecamatan: addr.city_district || addr.district || addr.county || "",
-      kota: addr.city || addr.town || addr.municipality || addr.regency || "",
-      provinsi: addr.state || addr.region || "",
+      kota: canonicalKota, // "Kota Pekanbaru" bukan "Pekanbaru"
+      provinsi: canonicalProvinsi,
     };
   } catch (error) {
     console.error("Reverse geocoding error:", error);
-    // Return string kosong jika gagal (misalnya tidak ada internet)
     return {
       address: "",
       kelurahan: "",
